@@ -86,3 +86,19 @@ Append one entry per work session. Do not edit or delete prior entries.
   `GAME_DESIGN_GENERATOR_VARIANT.md`, `GAMEPLAY_LOOPS.md`, and
   `DECISIONS_LOG.md` still do not exist — a human should confirm whether
   they exist elsewhere or need authoring.
+
+### Generator: multiple heroes per class, random selection on spawn
+- Status: complete
+- What was done: Changed `HeroClassConfig.heroPrefab` (single) to
+  `HeroClassConfig.heroPrefabs` (`GameObject[]`) so a generator can hold
+  multiple heroes of the same class. `Generator.TryTap()` now picks one
+  prefab at random (`Random.Range`) before spending mana; if the array is
+  empty/null it no-ops without spending mana, same as the existing
+  afford/slot checks. Updated `GeneratorSetupTool.cs` to seed each
+  generated config's `heroPrefabs` with a single-entry array (add more
+  prefabs manually in the Inspector for actual variety per class).
+  Updated `SYS_Generator.md`'s implementation notes accordingly.
+- Source: explicit user request (not an inferred/guessed design value —
+  no `// TODO(design)` needed for the random-selection behavior itself).
+- What's left: none for this change. Balance/variety of actual hero
+  prefabs per class is a content task, not a code task.

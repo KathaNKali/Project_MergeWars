@@ -48,9 +48,15 @@ namespace MergeWars.Generators
                 return false;
             }
 
+            GameObject heroPrefab = GetRandomHeroPrefab();
+            if (heroPrefab == null)
+            {
+                return false;
+            }
+
             manaEconomy.Spend(config.manaCost);
 
-            GameObject hero = poolManager.Get(config.heroPrefab);
+            GameObject hero = poolManager.Get(heroPrefab);
             if (hero == null)
             {
                 return false;
@@ -72,6 +78,21 @@ namespace MergeWars.Generators
         private void OnMouseDown()
         {
             TryTap();
+        }
+
+        /// <summary>
+        /// Picks one hero prefab at random from the config's hero pool.
+        /// Returns null if the config has no prefabs assigned.
+        /// </summary>
+        private GameObject GetRandomHeroPrefab()
+        {
+            if (config.heroPrefabs == null || config.heroPrefabs.Length == 0)
+            {
+                return null;
+            }
+
+            int index = Random.Range(0, config.heroPrefabs.Length);
+            return config.heroPrefabs[index];
         }
     }
 }

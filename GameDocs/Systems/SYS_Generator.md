@@ -32,16 +32,22 @@
 - No unlock check exists in code, per spec — not even a stub.
 - `HeroClassConfig` implemented at `Assets/Scripts/Generator/HeroClassConfig.cs`
   with `HeroClassId` enum (`Ground`, `Air`, `Vehicles`), `int manaCost`,
-  `GameObject heroPrefab`. Three asset instances plus placeholder prefabs
-  (primitive capsule/sphere/cube) are created via an editor-only utility,
+  `GameObject[] heroPrefabs` — a generator can hold multiple heroes of the
+  same class; `Generator.TryTap()` picks one at random
+  (`Random.Range(0, heroPrefabs.Length)`) each time it spawns. If the
+  array is empty/null, `TryTap()` no-ops before spending mana. Three asset
+  instances plus placeholder prefabs (primitive capsule/sphere/cube) are
+  created via an editor-only utility,
   `Assets/Editor/GeneratorSetupTool.cs` (menu: `MergeWars/Setup/Create
   Placeholder Hero Assets`) — run this once in the Unity Editor to
   generate `Assets/Prefabs/Heroes/*.prefab` and
-  `Assets/Configs/HeroClasses/HeroClassConfig_*.asset`. This was necessary
-  because asset/prefab binary-ish files can't be safely hand-authored
-  outside the Editor; the tool uses real Unity APIs
-  (`GameObject.CreatePrimitive`, `PrefabUtility.SaveAsPrefabAsset`,
-  `ScriptableObject.CreateInstance`) so the result is guaranteed valid.
+  `Assets/Configs/HeroClasses/HeroClassConfig_*.asset` (each seeded with a
+  single-entry `heroPrefabs` array; add more prefabs to the array in the
+  Inspector for actual variety). This was necessary because asset/prefab
+  binary-ish files can't be safely hand-authored outside the Editor; the
+  tool uses real Unity APIs (`GameObject.CreatePrimitive`,
+  `PrefabUtility.SaveAsPrefabAsset`, `ScriptableObject.CreateInstance`) so
+  the result is guaranteed valid.
 - `// TODO(design)` markers left in code:
   - `HeroClassConfig.manaCost` default (10) and the per-class values the
     setup tool assigns (Ground 10 / Air 15 / Vehicles 20) are ASSUMED

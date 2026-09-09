@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4e962b3a7acb4a048a322773418a4eb2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Animations/ColonelAvatarMask.mask
+  uploadId: 846008

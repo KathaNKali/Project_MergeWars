@@ -56,7 +56,7 @@ namespace MergeWars.EditorTools
 
             config.classId = classId;
             config.manaCost = manaCost;
-            config.heroPrefab = prefab;
+            config.heroPrefabs = new[] { prefab };
             EditorUtility.SetDirty(config);
         }
 
