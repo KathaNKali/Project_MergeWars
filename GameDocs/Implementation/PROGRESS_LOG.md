@@ -102,3 +102,122 @@ Append one entry per work session. Do not edit or delete prior entries.
   no `// TODO(design)` needed for the random-selection behavior itself).
 - What's left: none for this change. Balance/variety of actual hero
   prefabs per class is a content task, not a code task.
+
+### Real Mana + Coin Economy (Generator Variant)
+- Status: complete
+- What was done: Created a shared `CurrencyEconomy` base
+  (`Assets/Scripts/Economy/CurrencyEconomy.cs`) covering current amount,
+  max cap, `CanAfford`/`Spend`, and a serialized `CurrencyUpgradeTier`
+  list with `HasNextUpgradeTier()`/`TryUpgradeCap()` for raising the cap
+  by spending the currency's own points. Refactored `ManaEconomy` from
+  the earlier bare stub into a thin `CurrencyEconomy` subclass
+  (kept `CurrentMana` as a compatibility alias so `Generator` needed no
+  changes). Added `CoinEconomy` as a second subclass with a
+  `CurrentCoins` alias and no consumer yet. Rewrote `SYS_ManaEconomy.md`
+  from "STUB ONLY" to a real-implementation doc and authored a new
+  `SYS_CoinEconomy.md` with matching structure. Updated `SYSTEM_MAP.md`
+  and `PROJECT_INDEX.md` (systems table, open unknowns, logical next
+  step) to reflect both currencies as real, plus a new Tech Stack &
+  Dependencies section recording FEEL / TopDown Engine / DoTween /
+  Cinemachine as confirmed-but-not-yet-integrated dependencies.
+- What's left: no reward-hook API (`AddMana`/`AddCoins`) exists yet —
+  intentionally deferred until a combat/base-destruction system is
+  built. No spender/shop consumes coins yet either. MergeSystem remains
+  the next unbuilt system referenced by other docs.
+
+### Hero Character Data Architecture (Generator Variant)
+- Status: complete
+- What was done: Built the foundational per-hero data layer ahead of
+  MergeSystem. Created `HeroRole` (enum: Tank, MeleeDps, RangedDps,
+  Support, Controller — the "Class" layer), replacing the retired
+  `HeroClassId` (Ground/Air/Vehicles). Created `HeroStats` (serializable
+  struct: Health, Attack, AttackSpeed, Range, Armor, CritChance,
+  CritDamage — the "Stats" layer) with a `Multiply` helper for star
+  scaling. Created `HeroDefinition` (ScriptableObject, one asset per
+  individual hero — not per class) with `heroId` (unique string, the key
+  the future MergeSystem will use for match validation), `displayName`,
+  `role`, `baseStats`, `perStarMultiplier` (default 1.5), `prefab`, and
+  `GetStatsForStar(int starLevel)` which compounds the multiplier per
+  star above 1. Created `HeroInstance` (MonoBehaviour, attached to
+  spawned heroes) holding `definition` + `starLevel` with a computed
+  `CurrentStats` property. Scaffolded the five remaining architecture
+  layers (Subclass, Species, Background, Feats, Equipment/Spells) as
+  empty placeholder classes with a single `id` field each — no real
+  content, per explicit scope decision to build only Class + Stats for
+  real this pass. Retired `HeroClassConfig.cs`, replaced by
+  `GeneratorConfig.cs` (`manaCost` + `heroPool` of `HeroDefinition[]`,
+  `GetRandomHeroDefinition()`). Updated `Generator.TryTap()` to consume
+  `GeneratorConfig`/`HeroDefinition` and set up `HeroInstance` on spawn.
+  Rewrote `GeneratorSetupTool.cs` to seed placeholder `HeroDefinition`
+  assets + a sample `GeneratorConfig` instead of the old
+  `HeroClassConfig` assets. Added `HeroDefinitionValidator.cs` (editor
+  menu `MergeWars/Validate/Check Duplicate Hero IDs`) to warn on
+  duplicate `heroId` values across all `HeroDefinition` assets
+  (non-blocking, manual-run). Authored `SYS_HeroDefinition.md`, updated
+  `SYS_Generator.md`, `SYSTEM_MAP.md`, and `PROJECT_INDEX.md`
+  accordingly.
+- Source: explicit user request/design brief (Class/Subclass/Species/
+  Background/Stats/Feats/Equipment-Spells layering, HeroRole values,
+  per-hero authoring, unique heroId for future merge-matching, editor
+  duplicate-ID validation) — clarified via Q&A before implementation.
+- What's left: MergeSystem itself (the immediate next task) — will read
+  `HeroInstance.definition.heroId` + `starLevel` to validate merges (max
+  star level 4, confirmed), and mutate `starLevel` on the destination
+  hero on success. No combat/damage resolution consumes `HeroStats` yet.
+- TODO(design) markers left in code: every `HeroStats` field value and
+  `HeroDefinition.perStarMultiplier` (1.5) are ASSUMED PLACEHOLDERS
+  pending a real balance pass; `HeroSubclass`/`HeroSpecies`/
+  `HeroBackground`/`HeroFeat`/`HeroEquipmentSpell` are explicitly marked
+  scaffolded-only with no real content or rules.
+- TODO(design)/open unknowns left: whether currencies are a single
+  global pool vs. per-player/per-base is UNRESOLVED (implemented as
+  global for now); whether cap-upgrade cost is paid in the same currency
+  is assumed, not confirmed; starting amounts, max caps, and all
+  upgrade-tier cost/newMaxCap values are ASSUMED PLACEHOLDERS pending a
+  real balance pass.
+
+### MergeSystem (Generator Variant)
+- Status: complete
+- What was done: Built `MergeSystem` (`Assets/Scripts/Merge/MergeSystem.cs`),
+  which validates and executes merges between two occupied grid slots.
+  `CanMerge(HeroInstance, HeroInstance)` checks: both instances non-null
+  with a non-null `definition`, `definition.heroId` matches exactly
+  (CONFIRMED as the match key — not prefab identity), `starLevel` matches,
+  and the destination is below the max star level (4, CONFIRMED — merging
+  two max-star heroes is a no-op, not a sell/convert mechanic).
+  `TryMerge(slotIndexA, slotIndexB)` increments the destination
+  (`slotIndexB`) hero's `starLevel`, then removes the source
+  (`slotIndexA`) occupant via `GridManager.RemoveOccupant` and releases it
+  via `PoolManager.Release`. No adjacency requirement (CONFIRMED). Added
+  `GridManager.TryGetSlotIndexForOccupant(GameObject)` — reverse lookup
+  needed by merge input to resolve a hero GameObject back to its slot
+  index (previously only the forward `GetOccupant(slotIndex)` existed).
+  Built both confirmed input triggers as a single component,
+  `HeroMergeInput` (`Assets/Scripts/Merge/HeroMergeInput.cs`) — not two
+  separate components, since Unity's `OnMouseDown`/`OnMouseDrag`/
+  `OnMouseUp` dispatch is per-GameObject and two independent components
+  would double-handle the same mouse events. It disambiguates tap vs.
+  drag by total mouse-movement distance during the press
+  (`dragThresholdPixels`, default 10, ASSUMED PLACEHOLDER). Tap-tap-select
+  uses a static `selectedForTap` field shared across all hero instances.
+  Drag-and-drop repositions the hero via raycast while held and snaps back
+  to its original position (no tween) if released over an invalid target.
+  `Generator` gained an optional `mergeSystem` field — if assigned,
+  `TryTap()` gets-or-adds a `HeroMergeInput` on the spawned hero and calls
+  `Initialize(gridManager, mergeSystem)`; if left unassigned, spawned
+  heroes simply have no merge input, with no effect on Generator's core
+  spawn flow. Authored `SYS_MergeSystem.md`; updated `SYS_Generator.md`,
+  `SYSTEM_MAP.md`, and `PROJECT_INDEX.md` accordingly.
+- Source: explicit user request/design brief (max 4-star merge, same-hero
+  matching, both tap-tap and drag-and-drop input, no adjacency
+  requirement, no-op at max star) — clarified via Q&A before
+  implementation, building directly on the prior Hero Character Data
+  Architecture task's `HeroDefinition.heroId`/`HeroInstance.starLevel`.
+- What's left: no visual/audio feedback on a successful merge (FEEL/
+  DoTween still unintegrated project-wide). No combat/damage system
+  consumes the resulting `HeroStats` yet. `MergeSystem.CanMerge` is
+  public but currently unused by any preview/highlight UI.
+- TODO(design) markers left in code: `HeroMergeInput.dragThresholdPixels`
+  (10) is an ASSUMED PLACEHOLDER — no spec for tap-vs-drag sensitivity;
+  the max-star constant (4) is hardcoded in `MergeSystem` rather than
+  sourced from a shared config, since none exists yet.

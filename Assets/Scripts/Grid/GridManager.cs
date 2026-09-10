@@ -156,6 +156,30 @@ namespace MergeWars.Grid
             return IsValidIndex(slotIndex) ? slots[slotIndex].occupant : null;
         }
 
+        /// <summary>
+        /// Reverse lookup: finds the slot index currently holding the given
+        /// occupant. Returns false if the occupant isn't placed in any
+        /// slot. Used by merge-input systems that resolve a tapped/dragged
+        /// hero GameObject back to its slot.
+        /// </summary>
+        public bool TryGetSlotIndexForOccupant(GameObject occupant, out int slotIndex)
+        {
+            if (occupant != null && slots != null)
+            {
+                for (int i = 0; i < slots.Length; i++)
+                {
+                    if (slots[i].isOccupied && slots[i].occupant == occupant)
+                    {
+                        slotIndex = i;
+                        return true;
+                    }
+                }
+            }
+
+            slotIndex = -1;
+            return false;
+        }
+
         public Vector3 GetWorldPosition(int slotIndex)
         {
             return IsValidIndex(slotIndex) ? slots[slotIndex].worldPosition : (anchor != null ? anchor.position : transform.position);

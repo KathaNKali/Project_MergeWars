@@ -2,6 +2,8 @@ using UnityEngine;
 using MergeWars.Grid;
 using MergeWars.Pooling;
 using MergeWars.Economy;
+using MergeWars.Heroes;
+using MergeWars.Merge;
 
 namespace MergeWars.Generators
 {
@@ -18,13 +20,16 @@ namespace MergeWars.Generators
     [RequireComponent(typeof(Collider))]
     public class Generator : MonoBehaviour
     {
-        [SerializeField] private HeroClassConfig config;
+        [SerializeField] private GeneratorConfig config;
         [SerializeField] private GridManager gridManager;
         [SerializeField] private ManaEconomy manaEconomy;
         [SerializeField] private PoolManager poolManager;
 
         [Tooltip("Spawned heroes are parented here, never to the Generator itself.")]
         [SerializeField] private Transform championsContainer;
+
+        [Tooltip("Optional. If assigned, spawned heroes get a HeroMergeInput component wired to this MergeSystem/GridManager, enabling tap-tap and drag-to-merge input.")]
+        [SerializeField] private MergeSystem mergeSystem;
 
         /// <summary>
         /// Attempts to spend mana and spawn this generator's hero into the
@@ -48,15 +53,15 @@ namespace MergeWars.Generators
                 return false;
             }
 
-            GameObject heroPrefab = GetRandomHeroPrefab();
-            if (heroPrefab == null)
+            HeroDefinition heroDefinition = config.GetRandomHeroDefinition();
+            if (heroDefinition == null || heroDefinition.prefab == null)
             {
                 return false;
             }
 
             manaEconomy.Spend(config.manaCost);
 
-            GameObject hero = poolManager.Get(heroPrefab);
+            GameObject hero = poolManager.Get(heroDefinition.prefab);
             if (hero == null)
             {
                 return false;
@@ -64,6 +69,24 @@ namespace MergeWars.Generators
 
             hero.transform.SetParent(championsContainer, worldPositionStays: false);
             hero.transform.position = gridManager.GetWorldPosition(slotIndex);
+
+            HeroInstance heroInstance = hero.GetComponent<HeroInstance>();
+            if (heroInstance == null)
+            {
+                heroInstance = hero.AddComponent<HeroInstance>();
+            }
+            heroInstance.definition = heroDefinition;
+            heroInstance.starLevel = 1;
+
+            if (mergeSystem != null)
+            {
+                HeroMergeInput mergeInput = hero.GetComponent<HeroMergeInput>();
+                if (mergeInput == null)
+                {
+                    mergeInput = hero.AddComponent<HeroMergeInput>();
+                }
+                mergeInput.Initialize(gridManager, mergeSystem);
+            }
 
             gridManager.PlaceOccupant(slotIndex, hero);
 
@@ -78,21 +101,6 @@ namespace MergeWars.Generators
         private void OnMouseDown()
         {
             TryTap();
-        }
-
-        /// <summary>
-        /// Picks one hero prefab at random from the config's hero pool.
-        /// Returns null if the config has no prefabs assigned.
-        /// </summary>
-        private GameObject GetRandomHeroPrefab()
-        {
-            if (config.heroPrefabs == null || config.heroPrefabs.Length == 0)
-            {
-                return null;
-            }
-
-            int index = Random.Range(0, config.heroPrefabs.Length);
-            return config.heroPrefabs[index];
         }
     }
 }
