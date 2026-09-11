@@ -43,13 +43,29 @@ namespace MergeWars.Merge
             this.mergeSystem = mergeSystem;
         }
 
-        [Tooltip("Layer mask used when raycasting for a drop target while dragging. Defaults to Everything.")]
+        [Tooltip("Layer mask used when raycasting for a hero drop target at release/tap time. Should include only the layer heroes are on (e.g. 'Heroes'), not the ground.")]
         [SerializeField] private LayerMask dropTargetMask = ~0;
+
+        // TODO(design): ASSUMED PLACEHOLDER — no spec exists for exactly
+        // how far above the ground/grid a hero should visually lift while
+        // being dragged/selected. Purely cosmetic — GridManager still
+        // controls the final settled world position once released. This is
+        // now also the fixed height of the virtual drag plane, so the hero
+        // no longer bobs up/down with real ground geometry while dragging.
+        [Tooltip("Height (relative to the hero's position when picked up) the hero is held at while being dragged. Drag movement happens on a flat virtual plane at this height, so it never bobs with ground geometry.")]
+        [SerializeField] private float dragHeightOffset = 0.5f;
+
+        // TODO(design): ASSUMED PLACEHOLDER — no spec exists for how
+        // "snappy" vs "floaty" the card-like drag glide should feel.
+        [Tooltip("Smoothing time for SmoothDamp while dragging — lower is snappier, higher is floatier/more card-like glide.")]
+        [SerializeField] private float dragSmoothTime = 0.06f;
 
         // TODO(design): ASSUMED PLACEHOLDER — no spec exists for how far
         // the mouse must move (in screen pixels) before a press counts as
         // a drag instead of a tap.
         [SerializeField] private float dragThresholdPixels = 10f;
+
+        private Collider ownCollider;
 
         // Static so tap-select state is shared across all heroes — only
         // one hero can be "pending" at a time.
@@ -59,6 +75,19 @@ namespace MergeWars.Merge
         private Vector3 mouseDownScreenPosition;
         private bool isPressed;
         private bool isDragging;
+
+        // Virtual drag plane state — movement while dragging is resolved
+        // against a flat plane at a fixed height instead of the real
+        // ground collider, so height never varies with ground geometry.
+        private Plane dragPlane;
+        private Vector3 dragTargetPosition;
+        private Vector3 dragVelocity;
+        private bool ownColliderWasTrigger;
+
+        private void Awake()
+        {
+            ownCollider = GetComponent<Collider>();
+        }
 
         private void OnMouseDown()
         {
@@ -82,14 +111,78 @@ namespace MergeWars.Merge
                 {
                     return;
                 }
-                isDragging = true;
+                StartDrag();
             }
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, dropTargetMask))
+            if (dragPlane.Raycast(ray, out float enter))
             {
-                transform.position = hit.point;
+                dragTargetPosition = ray.GetPoint(enter);
             }
+        }
+
+        /// <summary>
+        /// Begins the drag: sets up a fixed-height virtual plane (so the
+        /// hero holds a constant height regardless of ground geometry) and
+        /// switches the collider to a trigger so it can pass freely over
+        /// other heroes without physical collision/jostling while dragged.
+        /// </summary>
+        private void StartDrag()
+        {
+            isDragging = true;
+            dragVelocity = Vector3.zero;
+            dragTargetPosition = transform.position;
+
+            float planeHeight = originalWorldPosition.y + dragHeightOffset;
+            dragPlane = new Plane(Vector3.up, new Vector3(0f, planeHeight, 0f));
+
+            if (ownCollider != null)
+            {
+                ownColliderWasTrigger = ownCollider.isTrigger;
+                ownCollider.isTrigger = true;
+            }
+        }
+
+        private void Update()
+        {
+            if (!isDragging)
+            {
+                return;
+            }
+
+            transform.position = Vector3.SmoothDamp(transform.position, dragTargetPosition, ref dragVelocity, dragSmoothTime);
+        }
+
+        /// <summary>
+        /// Raycasts against the given layer mask while excluding this
+        /// hero's own collider — without this, dragging a hero can hit
+        /// its own collider first and snap the hero toward the camera
+        /// instead of onto the intended ground/slot position.
+        /// </summary>
+        private bool TryRaycastIgnoringSelf(Ray ray, LayerMask mask, out RaycastHit hit)
+        {
+            RaycastHit[] hits = Physics.RaycastAll(ray, Mathf.Infinity, mask);
+            RaycastHit closest = default;
+            float closestDistance = Mathf.Infinity;
+            bool found = false;
+
+            foreach (RaycastHit candidate in hits)
+            {
+                if (ownCollider != null && candidate.collider == ownCollider)
+                {
+                    continue;
+                }
+
+                if (candidate.distance < closestDistance)
+                {
+                    closestDistance = candidate.distance;
+                    closest = candidate;
+                    found = true;
+                }
+            }
+
+            hit = closest;
+            return found;
         }
 
         private void OnMouseUp()
@@ -103,6 +196,10 @@ namespace MergeWars.Merge
             if (isDragging)
             {
                 isDragging = false;
+                if (ownCollider != null)
+                {
+                    ownCollider.isTrigger = ownColliderWasTrigger;
+                }
                 HandleDragRelease();
             }
             else
@@ -173,7 +270,7 @@ namespace MergeWars.Merge
         private GameObject ResolveHeroUnderCursor()
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, dropTargetMask))
+            if (TryRaycastIgnoringSelf(ray, dropTargetMask, out RaycastHit hit))
             {
                 HeroInstance heroInstance = hit.collider.GetComponent<HeroInstance>();
                 if (heroInstance != null)
@@ -193,8 +290,13 @@ namespace MergeWars.Merge
             {
                 selectedForTap = null;
             }
+            if (isDragging && ownCollider != null)
+            {
+                ownCollider.isTrigger = ownColliderWasTrigger;
+            }
             isPressed = false;
             isDragging = false;
         }
     }
 }
+ 

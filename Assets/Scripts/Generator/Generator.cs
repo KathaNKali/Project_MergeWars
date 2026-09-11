@@ -68,7 +68,8 @@ namespace MergeWars.Generators
             }
 
             hero.transform.SetParent(championsContainer, worldPositionStays: false);
-            hero.transform.position = gridManager.GetWorldPosition(slotIndex);
+            Vector3 slotPosition = gridManager.GetWorldPosition(slotIndex);
+            hero.transform.position = slotPosition + Vector3.up * heroDefinition.spawnHeightOffset;
 
             HeroInstance heroInstance = hero.GetComponent<HeroInstance>();
             if (heroInstance == null)

@@ -229,7 +229,8 @@ Transform:
   m_Children:
   - {fileID: 1825840475}
   - {fileID: 1053274651}
-  - {fileID: 273055118}
+  - {fileID: 1658988515}
+  - {fileID: 2075556531}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &164188470
@@ -464,12 +465,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 273055117}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 73828932}
+  m_Father: {fileID: 1658988515}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &273055119
 MonoBehaviour:
@@ -483,8 +484,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92139a67c259d0f468f214f314196aed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Economy.ManaEconomy
-  currentAmount: 0
-  maxCap: 100
+  currentAmount: 1000
+  maxCap: 1000
   upgradeTiers: []
   currentTierIndex: 0
 --- !u!1 &432370271
@@ -597,6 +598,54 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 497709002}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &624528266
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 624528267}
+  - component: {fileID: 624528268}
+  m_Layer: 0
+  m_Name: CoinEconomy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &624528267
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 624528266}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1658988515}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &624528268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 624528266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3739bd4c2f759b746a8c21a0e48280c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Economy.CoinEconomy
+  currentAmount: 100
+  maxCap: 100
+  upgradeTiers: []
+  currentTierIndex: 0
 --- !u!1001 &637496912
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -882,6 +931,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2110113020}
+  - {fileID: 1293313168}
   - {fileID: 212890469}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -906,7 +956,7 @@ PrefabInstance:
     - target: {fileID: 3938279705400757302, guid: 9633e0e5581e4b940b897069f5d01df5,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 29.38
+      value: 29.25
       objectReference: {fileID: 0}
     - target: {fileID: 3938279705400757302, guid: 9633e0e5581e4b940b897069f5d01df5,
         type: 3}
@@ -1325,15 +1375,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Pooling.PoolManager
   prewarmEntries:
-  - prefab: {fileID: 4647067264398379931, guid: 6dad21992587013468eee9d4080d11e2,
+  - prefab: {fileID: 2794571907202600602, guid: 18c59fb010f9296409427eb959d9a698,
       type: 3}
-    initialPoolSize: 2
-  - prefab: {fileID: 1508520303796724515, guid: 967bbf4b18d26c24b8dd5fb511cc7188,
+    initialPoolSize: 3
+  - prefab: {fileID: 158403920635866334, guid: df363a4bdd9ea084a85cb5bbf4dd6a9a, type: 3}
+    initialPoolSize: 3
+  - prefab: {fileID: 8140562152776774930, guid: ea61080512a589d4db381ade4832b9de,
       type: 3}
-    initialPoolSize: 2
-  - prefab: {fileID: 7140048827612622301, guid: 9ab1ebaddc7718343965bf0ceb59a371,
-      type: 3}
-    initialPoolSize: 2
+    initialPoolSize: 3
   poolContainer: {fileID: 432370272}
 --- !u!1 &1118980006
 GameObject:
@@ -1360,7 +1409,7 @@ Transform:
   m_GameObject: {fileID: 1118980006}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -3.36, y: 0, z: 1.21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1445,6 +1494,137 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1175561223}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1293313167
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1293313168}
+  - component: {fileID: 1293313172}
+  - component: {fileID: 1293313171}
+  - component: {fileID: 1293313170}
+  - component: {fileID: 1293313169}
+  m_Layer: 0
+  m_Name: Generator_G2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1293313168
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293313167}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.951, y: 0.63, z: -4.98}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 808316756}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1293313169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293313167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1bc55195be0e214fbbf59759cf4bc66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Generators.Generator
+  config: {fileID: 11400000, guid: a567fdb059b54434c8b0fcae4e107a7f, type: 2}
+  gridManager: {fileID: 1825840476}
+  manaEconomy: {fileID: 273055119}
+  poolManager: {fileID: 1053274652}
+  championsContainer: {fileID: 432370272}
+  mergeSystem: {fileID: 2075556530}
+--- !u!65 &1293313170
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293313167}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1293313171
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293313167}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1293313172
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293313167}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1356206084
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1576,51 +1756,44 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 224495582061553100, guid: cb2be75ff9838bd4d874077280b5c07c,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 224495582061553100, guid: cb2be75ff9838bd4d874077280b5c07c,
-        type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 224495582061553100, guid: cb2be75ff9838bd4d874077280b5c07c,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 100.37988
-      objectReference: {fileID: 0}
-    - target: {fileID: 224495582061553100, guid: cb2be75ff9838bd4d874077280b5c07c,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 172.455
-      objectReference: {fileID: 0}
-    - target: {fileID: 224495582061553100, guid: cb2be75ff9838bd4d874077280b5c07c,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -50.18994
-      objectReference: {fileID: 0}
-    - target: {fileID: 1137535785635986062, guid: cb2be75ff9838bd4d874077280b5c07c,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.26643133
-      objectReference: {fileID: 0}
-    - target: {fileID: 1141651450768826682, guid: cb2be75ff9838bd4d874077280b5c07c,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.26643133
-      objectReference: {fileID: 0}
-    - target: {fileID: 6513076272023696034, guid: cb2be75ff9838bd4d874077280b5c07c,
-        type: 3}
-      propertyPath: Target.TrackingTarget
-      value: 
-      objectReference: {fileID: 1118980007}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cb2be75ff9838bd4d874077280b5c07c, type: 3}
+--- !u!1 &1658988514
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1658988515}
+  m_Layer: 0
+  m_Name: Economy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1658988515
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1658988514}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 273055118}
+  - {fileID: 624528267}
+  m_Father: {fileID: 73828932}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1785449389
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1824,10 +1997,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Grid.GridManager
   rows: 4
-  columns: 4
+  columns: 5
   anchor: {fileID: 1118980007}
-  cellSizeX: 1
-  cellSizeZ: 1
+  cellSizeX: 1.5
+  cellSizeZ: 1.5
   columnAxis: {x: 1, y: 0, z: 0}
   rowAxis: {x: 0, y: 0, z: -1}
   drawDebugGizmo: 1
@@ -2070,6 +2243,52 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1980608067}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2075556529
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2075556531}
+  - component: {fileID: 2075556530}
+  m_Layer: 0
+  m_Name: MergeSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2075556530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075556529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 201f149e2536e8f4a9dfb7523a97bc85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Merge.MergeSystem
+  gridManager: {fileID: 1825840476}
+  poolManager: {fileID: 1053274652}
+--- !u!4 &2075556531
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075556529}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 73828932}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2110113015
 GameObject:
   m_ObjectHideFlags: 0
@@ -2084,7 +2303,7 @@ GameObject:
   - component: {fileID: 2110113017}
   - component: {fileID: 2110113016}
   m_Layer: 0
-  m_Name: Generator_Ground
+  m_Name: Generator_G1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2102,12 +2321,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1bc55195be0e214fbbf59759cf4bc66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Generators.Generator
-  config: {fileID: 11400000, guid: 8e056e9b32a818e4da8bb459cd2dabf2, type: 2}
+  config: {fileID: 11400000, guid: 959465e86d0ad984594d1795ea63ed71, type: 2}
   gridManager: {fileID: 1825840476}
   manaEconomy: {fileID: 273055119}
   poolManager: {fileID: 1053274652}
   championsContainer: {fileID: 432370272}
-  mergeSystem: {fileID: 0}
+  mergeSystem: {fileID: 2075556530}
 --- !u!65 &2110113017
 BoxCollider:
   m_ObjectHideFlags: 0

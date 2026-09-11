@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 149bf21f29034084ab4630e519c2431b, type: 3}
+  m_Name: HeroDefinition_rangeddps_placeholder_01
+  m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Heroes.HeroDefinition
+  heroId: rangeddps_placeholder_01
+  displayName: rangeddps_placeholder_01
+  role: 2
+  baseStats:
+    health: 0
+    attack: 0
+    attackSpeed: 0
+    range: 0
+    armor: 0
+    critChance: 0
+    critDamage: 0
+  perStarMultiplier: 1.5
+  prefab: {fileID: 158403920635866334, guid: df363a4bdd9ea084a85cb5bbf4dd6a9a, type: 3}
+  subclass:
+    id: 
+  species:
+    id: 
+  background:
+    id: 
+  feats: []
+  equipmentSpells: []

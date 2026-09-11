@@ -323,6 +323,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 5558584025886084038}
   - {fileID: 1141651450768826682}
   - {fileID: 1137535785635986062}
   - {fileID: 4776084761794064}
@@ -4851,7 +4852,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4776084761794064
 Transform:
   m_ObjectHideFlags: 0
@@ -6370,10 +6371,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 224931852115754924}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 129, y: 42}
-  m_SizeDelta: {x: 344.91, y: 100.38}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 172.455, y: -50.18994}
+  m_SizeDelta: {x: 344.91, y: 100.37988}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &222169681854706356
 CanvasRenderer:
@@ -7568,7 +7569,7 @@ Transform:
   m_GameObject: {fileID: 1135955040397125716}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-  m_LocalPosition: {x: 0.26643133, y: 11.522173, z: -15.12007}
+  m_LocalPosition: {x: 0.33915436, y: 17.862793, z: -18.937798}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7594,11 +7595,11 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 0}
+    TrackingTarget: {fileID: 5558584025886084038}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 45
+    FieldOfView: 45.8
     OrthographicSize: 10
     NearClipPlane: 0.1
     FarClipPlane: 5000
@@ -7629,7 +7630,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 886251e9a18ece04ea8e61686c173e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraDistance: 35
+  CameraDistance: 42.4
   DeadZoneDepth: 0
   Composition:
     ScreenPosition: {x: -0.016337534, y: -0.019914886}
@@ -7793,7 +7794,7 @@ GameObject:
   - component: {fileID: 1032431540898572916}
   - component: {fileID: 1031630300741307132}
   - component: {fileID: 6639677612785801984}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -7809,7 +7810,7 @@ Transform:
   m_GameObject: {fileID: 1135989009887641804}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-  m_LocalPosition: {x: 0.26643133, y: 11.522173, z: -15.12007}
+  m_LocalPosition: {x: 0.33915436, y: 17.862793, z: -18.937798}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7848,13 +7849,13 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 5000
-  field of view: 45
+  field of view: 45.8
   orthographic: 0
   orthographic size: 10
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4194087
+    m_Bits: 12582695
   m_RenderingPath: 1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -7986,3 +7987,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e8aa3525151bb343b66b059b6095946, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &4714089474953496914
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5558584025886084038}
+  m_Layer: 0
+  m_Name: CameraTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5558584025886084038
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4714089474953496914}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.49, y: -18.5, z: -2.12}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4847471433058572}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

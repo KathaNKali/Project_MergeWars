@@ -43,6 +43,14 @@ namespace MergeWars.Heroes
         [Tooltip("Pooled/visual prefab for this hero, used by Generator via PoolManager.Get().")]
         public GameObject prefab;
 
+        // TODO(design): ASSUMED PLACEHOLDER — no spec exists for exact
+        // pivot heights per hero model. Since prefab pivots are centered
+        // (not at the feet), this offset is added on top of the grid
+        // slot's world position (ground = 0,0,0) at spawn time so the
+        // hero visually stands on the ground instead of being half-buried.
+        [Tooltip("Vertical offset added at spawn so this hero's centered pivot sits above the ground instead of half-buried in it. Tune per-hero if models have different heights/pivots.")]
+        public float spawnHeightOffset = 0.5f;
+
         [Header("Scaffolded layers (TODO(design) — not implemented this pass)")]
         public HeroSubclass subclass;
         public HeroSpecies species;
@@ -65,3 +73,4 @@ namespace MergeWars.Heroes
         }
     }
 }
+
