@@ -18,6 +18,10 @@ the source hero back to the pool.
   knowledge of tap/drag/mouse/UI at all.
 - Adjacency — CONFIRMED not required; any two matching heroes anywhere on
   the grid can merge.
+- Strategic repositioning (drag-to-open-slot) — this lives entirely in
+  `HeroMergeInput`/`GridManager`, not `MergeSystem`. MergeSystem is only
+  ever invoked for an actual merge attempt; moving a hero to an empty
+  slot never calls into MergeSystem at all.
 
 ## Match rule (CONFIRMED)
 Two heroes are mergeable if and only if:
@@ -62,12 +66,27 @@ directly.
 	selected hero again to deselect.
   - **Drag-and-drop**: press and move the hero (follows the mouse via
 	raycast against a `dropTargetMask`, no tween — DoTween is not yet
-	integrated per PROJECT_INDEX.md); on release, if the cursor is over
-	another hero, attempts `MergeSystem.TryMerge`; otherwise snaps the
-	hero's transform back to its pre-drag position.
+	integrated per PROJECT_INDEX.md); on release, in priority order: (1)
+	if the cursor is over another hero, attempts `MergeSystem.TryMerge`;
+	(2) else if dropped near an **open** slot (CONFIRMED this pass —
+	strategic repositioning, so the player can place heroes tactically),
+	moves the hero into that slot via `GridManager.RemoveOccupant` (old
+	slot) + `GridManager.PlaceOccupant` (new slot), snapping the final
+	position to the slot's exact world position (not the raw drop
+	point); (3) otherwise snaps the hero's transform back to its
+	pre-drag position.
   - Tap vs. drag is disambiguated by total mouse-movement distance during
 	the press (`dragThresholdPixels`, ASSUMED PLACEHOLDER value, default
 	10 pixels — no spec exists for the exact threshold).
+  - Tap-tap-select does NOT support repositioning — it remains merge-only.
+	Moving to an open slot is drag-and-drop only, since tap-tap-select can
+	only target another hero's `HeroMergeInput` component (empty grid
+	space has no component to receive a tap).
+- **GridManager.TryGetNearestOpenSlotIndex** (added to
+  `Assets/Scripts/Grid/GridData.cs`, exposed via `GridManager`) — finds
+  the closest unoccupied slot to a world position, within a distance
+  threshold (the grid's cell size). Used by `HeroMergeInput` to resolve
+  a drag-release drop point to an open slot for repositioning.
 - **GridManager.TryGetSlotIndexForOccupant** (added to
   `Assets/Scripts/Grid/GridManager.cs`) — reverse lookup from an occupant
   GameObject back to its slot index, used by `HeroMergeInput` to resolve

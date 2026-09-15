@@ -32,6 +32,27 @@ namespace MergeWars.Generators
         [SerializeField] private MergeSystem mergeSystem;
 
         /// <summary>
+        /// Wires this Generator's scene-object dependencies (the Merge
+        /// grid's GridManager, ManaEconomy, PoolManager, the champions
+        /// container, and optionally MergeSystem) at runtime. Required
+        /// when Generator instances are instantiated from a prefab (e.g.
+        /// by GeneratorSpawner) rather than hand-placed in the scene,
+        /// since a prefab asset cannot itself hold references to scene
+        /// objects — those fields must be assigned after instantiation.
+        /// Hand-placed/scene-authored Generator instances can instead
+        /// assign these directly in the Inspector (as a per-instance
+        /// prefab override) and skip calling this.
+        /// </summary>
+        public void Initialize(GridManager gridManager, ManaEconomy manaEconomy, PoolManager poolManager, Transform championsContainer, MergeSystem mergeSystem = null)
+        {
+            this.gridManager = gridManager;
+            this.manaEconomy = manaEconomy;
+            this.poolManager = poolManager;
+            this.championsContainer = championsContainer;
+            this.mergeSystem = mergeSystem;
+        }
+
+        /// <summary>
         /// Attempts to spend mana and spawn this generator's hero into the
         /// next open grid slot. Returns false (no-op, no mana spent) if
         /// mana can't be afforded or the grid has no open slot.

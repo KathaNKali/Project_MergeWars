@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fda4c093199b4004faeabbe8a8b1d3d1, type: 3}
+  m_Name: GeneratorLoadout_00
+  m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Generators.GeneratorLoadout
+  generatorPrefabs:
+  - {fileID: 2460528965253972928, guid: 0aac96e21f8975342948974270f07d64, type: 3}
+  - {fileID: 8473497074822473560, guid: 41bfdb23579d99041a929f12d7049a57, type: 3}

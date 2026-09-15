@@ -15,7 +15,8 @@ flagged for human follow-up, not fabricated here.
 
 | System | Status | Location | Doc |
 |---|---|---|---|
-| GridManager | Built (real) | `Assets/Scripts/Grid/` | SYS_GridManager.md |
+| GridManager | Built (real, split into GridManager + GridData; multi-instance) | `Assets/Scripts/Grid/` | SYS_GridManager.md |
+| GeneratorSpawner / GeneratorLoadout | Built (real, prototype layout) | `Assets/Scripts/Generator/` | SYS_Generator.md |
 | PoolManager | Built (real) | `Assets/Scripts/Pooling/PoolManager.cs` | SYS_PoolManager.md |
 | CurrencyEconomy | Built (real, shared base) | `Assets/Scripts/Economy/CurrencyEconomy.cs` | SYS_ManaEconomy.md / SYS_CoinEconomy.md |
 | ManaEconomy | Built (real) | `Assets/Scripts/Economy/ManaEconomy.cs` | SYS_ManaEconomy.md |
@@ -34,6 +35,19 @@ flagged for human follow-up, not fabricated here.
 | Reward hook (base destruction → Mana/Coins) | Not built (intentionally deferred) | — | SYS_ManaEconomy.md / SYS_CoinEconomy.md |
 
 ## Open Unknowns (surfaced for next read, not buried in code)
+- `GeneratorSpawner`'s grid layout (1 row × generator-count columns) is an
+  ASSUMED PLACEHOLDER — no design for wrapping to multiple rows once
+  generator count grows. `GeneratorLoadout` currently just lists every
+  generator to spawn; how "whatever the player has chosen" actually maps
+  onto it (swap assigned asset vs. runtime-filtered list) is UNRESOLVED.
+- GridManager's slot-array logic was extracted into a plain C# `GridData`
+  class (`Assets/Scripts/Grid/GridData.cs`) this pass; GridManager is now
+  a thin MonoBehaviour wrapper. GridManager was never a singleton, so
+  multiple independent grid instances (e.g. Merge grid + Generator grid)
+  already coexist by placing multiple GridManager components in-scene
+  with independent config, each wired to its consumer via existing
+  serialized-reference fields. No registry/lookup-by-id layer exists.
+  A Building grid (for a future EnemyBaseManager) remains unbuilt.
 - `dragThresholdPixels` (10, on `HeroMergeInput`) is an ASSUMED
   PLACEHOLDER — no design spec for tap-vs-drag sensitivity. See
   SYS_MergeSystem.md.

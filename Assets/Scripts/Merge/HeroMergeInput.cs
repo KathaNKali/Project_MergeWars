@@ -217,9 +217,54 @@ namespace MergeWars.Merge
                 return;
             }
 
-            // No valid merge — snap back to original position (no tween;
-            // DoTween is not yet integrated per PROJECT_INDEX.md).
+            if (TryMoveToOpenSlot())
+            {
+                return;
+            }
+
+            // No valid merge or open slot to move into — snap back to
+            // original position (no tween; DoTween is not yet integrated
+            // per PROJECT_INDEX.md).
             transform.position = originalWorldPosition;
+        }
+
+        /// <summary>
+        /// Strategic repositioning (CONFIRMED this pass): if dropped near
+        /// an open slot (not another hero), moves this hero into that
+        /// slot instead of merging. Updates GridManager occupant data
+        /// (removes from the old slot, places into the new one) and
+        /// snaps the final position to the slot's exact world position —
+        /// not the raw drop point — so the hero stays grid-aligned.
+        /// Returns false (no-op) if no open slot is within range, or this
+        /// hero's current slot can't be resolved.
+        /// </summary>
+        private bool TryMoveToOpenSlot()
+        {
+            if (gridManager == null)
+            {
+                return false;
+            }
+
+            float maxDistance = Mathf.Max(gridManager.CellSizeX, gridManager.CellSizeZ);
+            if (!gridManager.TryGetNearestOpenSlotIndex(dragTargetPosition, maxDistance, out int newSlotIndex))
+            {
+                return false;
+            }
+
+            if (!gridManager.TryGetSlotIndexForOccupant(gameObject, out int oldSlotIndex))
+            {
+                return false;
+            }
+
+            if (newSlotIndex == oldSlotIndex)
+            {
+                return false;
+            }
+
+            gridManager.RemoveOccupant(oldSlotIndex);
+            gridManager.PlaceOccupant(newSlotIndex, gameObject);
+            transform.position = gridManager.GetWorldPosition(newSlotIndex);
+            return true;
         }
 
         private void HandleTap()

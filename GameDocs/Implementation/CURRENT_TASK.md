@@ -2,13 +2,19 @@
 # CURRENT_TASK.md
 
 ## Active task
-MergeSystem is complete (MergeSystem, HeroMergeInput, GridManager
-reverse-lookup — see SYS_MergeSystem.md). Heroes merge by
-HeroDefinition.heroId + HeroInstance.starLevel match, via both
-tap-tap-select and drag-and-drop input, no adjacency requirement, max
-star level 4 (no-op at max). No next task has been scoped yet — likely
-candidates are EnemyBaseManager or combat/damage resolution consuming
-HeroStats, but confirm with the project owner before starting either.
+Strategic hero repositioning built (see SYS_MergeSystem.md): dragging a
+hero and releasing near an OPEN (unoccupied) slot now moves it there
+instead of only merging or snapping back — CONFIRMED this pass, to let
+the player place heroes tactically before combat. Priority order on drag
+release: (1) drop on another hero → attempt merge; (2) drop near an open
+slot → move (updates GridManager occupant data, snaps to the slot's
+exact world position); (3) otherwise → snap back, unchanged. Drag-only —
+tap-tap-select remains merge-only (empty grid space has no component to
+receive a tap). Added `GridData`/`GridManager.TryGetNearestOpenSlotIndex`
+to support this.
+
+No next task has been scoped yet — confirm with the project owner
+before starting one.
 
 ## Active variant
 Generator & Continuous Conquest Variant

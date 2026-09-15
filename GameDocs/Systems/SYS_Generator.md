@@ -16,6 +16,61 @@
 - HeroDefinition (per-hero data asset — see SYS_HeroDefinition.md) and HeroInstance (MonoBehaviour set on the spawned hero at spawn time)
 - MergeSystem (optional — see SYS_MergeSystem.md) — if assigned, Generator also adds/initializes a HeroMergeInput component on the spawned hero so it becomes mergeable
 
+## Wiring scene-object dependencies when Generator is spawned from a prefab (new this pass)
+- CONFIRMED: `gridManager`, `manaEconomy`, `poolManager`, `championsContainer`,
+  and `mergeSystem` are all scene objects/references. A prefab **asset**
+  cannot itself hold a reference to a scene object, so a Generator
+  instantiated from a prefab (e.g. by GeneratorSpawner) always starts
+  with these fields empty — they must be assigned at runtime.
+- `Generator.Initialize(GridManager gridManager, ManaEconomy manaEconomy, PoolManager poolManager, Transform championsContainer, MergeSystem mergeSystem = null)`
+  was added for this — same pattern already used by
+  `HeroMergeInput.Initialize(...)`. Whoever instantiates a Generator
+  prefab is responsible for calling this immediately after
+  `Instantiate()`.
+- Hand-placed/scene-authored Generator instances (not spawned via
+  GeneratorSpawner) can instead assign these fields directly in the
+  Inspector on that scene instance (a per-instance prefab override) and
+  skip calling `Initialize`.
+
+## GeneratorSpawner (new this pass — game-start placement of Generators themselves)
+- CONFIRMED: a separate concern from Generator.TryTap() (which spawns
+  heroes into a grid when a Generator is tapped). GeneratorSpawner
+  instead places Generator *prefabs themselves* into slots on a dedicated
+  Generator grid (a second GridManager instance, separate from the Merge
+  grid) once, at game start.
+- Location: `Assets/Scripts/Generator/GeneratorSpawner.cs`,
+  `GeneratorLoadout.cs` (namespace `MergeWars.Generators`).
+- `GeneratorLoadout` (ScriptableObject) is authored config data only — an
+  ordered `Generator[] generatorPrefabs` array. GeneratorSpawner reads it
+  at `Start()` and never writes back to it. Not a stand-in for a
+  player-selection system yet — see Open Unknowns below.
+- `GeneratorSpawner` (MonoBehaviour): serialized refs to the Generator
+  grid's `GridManager`, a `GeneratorLoadout`, and the Merge-side scene
+  objects each spawned Generator needs (`mergeGridManager`,
+  `manaEconomy`, `poolManager`, `championsContainer`, optional
+  `mergeSystem`). At `Start()`: resizes the Generator grid via
+  `GridManager.SetDimensions(rows, columns)` — ASSUMED PLACEHOLDER
+  layout is 1 row × (generator count) columns — then for each prefab in
+  order: `Instantiate()`s it directly (no PoolManager — one-time spawn,
+  not repeatedly created/destroyed), positions it via
+  `GridManager.GetWorldPosition(slot)`, calls
+  `Generator.Initialize(mergeGridManager, manaEconomy, poolManager, championsContainer, mergeSystem)`
+  to wire its scene-object dependencies (see "Wiring scene-object
+  dependencies" above), and calls `GridManager.PlaceOccupant(slot, instance)`.
+- `GridManager.SetDimensions(int rows, int columns)` was added to
+  GridManager to support this — it only resizes+rebuilds; GridManager
+  still has no knowledge of *why* a caller wants a given size (sizing
+  policy stays outside GridManager, per SYS_GridManager.md).
+- UNKNOWN / ASSUMED PLACEHOLDER (flagged for follow-up):
+  - Layout beyond a single row (e.g. wrapping to multiple rows once
+    generator count grows) is not designed yet.
+  - How "whatever the player has chosen" maps onto `GeneratorLoadout` is
+    unresolved — currently it's just a static authored list of every
+    generator to spawn. A future selection/save system may swap which
+    `GeneratorLoadout` asset is assigned, or supply a runtime-filtered
+    list instead; `GeneratorLoadout` itself is not intended to hold
+    mutable per-session selection state.
+
 ## Implementation notes (added after PoolManager + Generator build)
 - Location: `Assets/Scripts/Generator/Generator.cs` (namespace
   `MergeWars.Generators`), MonoBehaviour, `[RequireComponent(typeof(Collider))]`

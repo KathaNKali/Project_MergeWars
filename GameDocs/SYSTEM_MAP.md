@@ -8,7 +8,13 @@ codebase — see PROJECT_INDEX.md for build status.
 ## Current systems
 
 - **GridManager** (`Assets/Scripts/Grid/`) — foundational. No dependencies
-  on other gameplay systems. See SYS_GridManager.md.
+  on other gameplay systems. Per-instance grid (not a singleton) — a thin
+  MonoBehaviour wrapper around a `GridData` instance (plain C# class
+  owning the slot array and slot lookup/mutation logic). Multiple
+  GridManager components can coexist in-scene as independent grids (e.g.
+  Merge grid, Generator grid), each with its own dimensions/anchor/cell
+  size, wired to consumers via explicit serialized references. See
+  SYS_GridManager.md.
 
 - **PoolManager** (`Assets/Scripts/Pooling/PoolManager.cs`) — foundational.
   No dependencies on other gameplay systems. See SYS_PoolManager.md.
@@ -67,6 +73,15 @@ codebase — see PROJECT_INDEX.md for build status.
   Implements both confirmed merge triggers (tap-tap-select and
   drag-and-drop) in a single component. See SYS_MergeSystem.md.
 
+- **GeneratorSpawner / GeneratorLoadout** (`Assets/Scripts/Generator/`) —
+  new this pass. `GeneratorSpawner` depends on:
+  - GridManager (the Generator grid instance — `SetDimensions`,
+    `TryGetOpenSlot`, `GetWorldPosition`, `PlaceOccupant`)
+  - GeneratorLoadout (data reference — ordered `Generator[]` list)
+  Places Generator prefabs themselves into the Generator grid once at
+  game start; distinct from Generator.TryTap() (which spawns heroes).
+  See SYS_Generator.md.
+
 ## Dependency edges (summary)
 
 ```
@@ -83,6 +98,8 @@ MergeSystem → PoolManager (Release)
 MergeSystem → HeroInstance (reads/mutates)
 HeroMergeInput → GridManager (TryGetSlotIndexForOccupant)
 HeroMergeInput → MergeSystem (TryMerge)
+GeneratorSpawner → GridManager (Generator grid — SetDimensions, TryGetOpenSlot, GetWorldPosition, PlaceOccupant)
+GeneratorSpawner → GeneratorLoadout (data)
 ManaEconomy → CurrencyEconomy (base class, not a runtime dependency edge)
 CoinEconomy → CurrencyEconomy (base class, not a runtime dependency edge)
 ```
