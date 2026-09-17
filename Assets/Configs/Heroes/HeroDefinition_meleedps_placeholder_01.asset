@@ -24,7 +24,8 @@ MonoBehaviour:
     critChance: 0
     critDamage: 0
   perStarMultiplier: 1.5
-  prefab: {fileID: 2794571907202600602, guid: 18c59fb010f9296409427eb959d9a698, type: 3}
+  prefab: {fileID: 1167761570092420, guid: 8d0b44bafd16bc64f80600786cc2bf6b, type: 3}
+  spawnHeightOffset: 0.5
   subclass:
     id: 
   species:

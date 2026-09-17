@@ -566,7 +566,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Grid.GridManager
   rows: 1
-  columns: 2
+  columns: 1
   anchor: {fileID: 586880837}
   cellSizeX: 2
   cellSizeZ: 1.5
