@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb3b44c697a9044b8d0a56c7dbca1da, type: 3}
   m_Name: GeneratorConfig_G2
   m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Generators.GeneratorConfig
+  barracksID: 
+  barracksName: Tank
+  classType: 0
   manaCost: 10
   heroPool:
   - {fileID: 11400000, guid: a401dc68b00f52f449b05afc2598fd0c, type: 2}

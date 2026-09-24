@@ -1,52 +1,114 @@
 namespace MergeWars.Heroes
 {
-    /// <summary>
-    /// Mathematical foundation layer of the character architecture (see
-    /// /GameDocs/Systems/SYS_HeroDefinition.md). Pure data, no behavior —
-    /// combat/damage resolution does not exist yet and is out of scope
-    /// here. All field values assigned on a HeroDefinition are
-    /// ASSUMED PLACEHOLDER; no balance doc specifies real numbers yet.
-    /// </summary>
+    public enum AttackType
+    {
+        Melee,
+        Ranged,
+        Area
+    }
+
+    public enum TargetTeam
+    {
+        Enemy,
+        Ally,
+        Self,
+        AllyOrSelf
+    }
+
+    public enum TargetType
+    {
+        Ground,
+        Air,
+        GroundAndAir,
+        Buildings,
+        GroundAndBuildings,
+        AirAndBuildings,
+        All
+    }
+
+    public enum TargetRestriction
+    {
+        None,
+        GroundOnly,
+        AirOnly,
+        BuildingsOnly,
+        TroopsOnly,
+        HeroesOnly,
+        DefensiveBuildingsOnly,
+        SupportUnitsOnly,
+        BossOnly
+    }
+
+    public enum TargetPreference
+    {
+        None,
+        Nearest,
+        LowestHealth,
+        HighestHealth,
+        LowestDamage,
+        HighestDamage,
+        Buildings,
+        DefensiveBuildings,
+        SupportUnits,
+        Tanks,
+        Backline,
+        AirUnits,
+        GroundUnits,
+        Boss
+    }
+
     [System.Serializable]
     public struct HeroStats
     {
-        // TODO(design): ASSUMED PLACEHOLDER — no balance doc exists yet.
-        public float health;
-
-        // TODO(design): ASSUMED PLACEHOLDER — no balance doc exists yet.
-        public float attack;
-
-        // TODO(design): ASSUMED PLACEHOLDER — no balance doc exists yet.
-        public float attackSpeed;
-
-        // TODO(design): ASSUMED PLACEHOLDER — no balance doc exists yet.
+        // Core combat stats
+        public float hitPoints;
+        public float targets;
+        public float hitSpeed;
         public float range;
+        public float damage;
+        public float damagePerSec;
+        public float count;
+        public float speed;
 
-        // TODO(design): ASSUMED PLACEHOLDER — no balance doc exists yet.
-        public float armor;
+        // Attack
+        public AttackType attackType;
+        public float projectileSpeed;
+        public float attackArea;
 
-        // TODO(design): ASSUMED PLACEHOLDER — no balance doc exists yet.
-        public float critChance;
-
-        // TODO(design): ASSUMED PLACEHOLDER — no balance doc exists yet.
-        public float critDamage;
+        // Targeting
+        public TargetTeam targetTeam;
+        public TargetType targetType;
+        public TargetRestriction targetRestriction;
+        public TargetPreference targetPreference;
 
         /// <summary>
-        /// Scales every field by a flat multiplier. Used by
-        /// HeroDefinition.GetStatsForStar to apply the confirmed
-        /// flat-per-star-multiplier scaling rule.
+        /// Scales numeric stats by a flat multiplier.
+        /// Targeting and attack-type properties remain unchanged.
         /// </summary>
         public static HeroStats Multiply(HeroStats stats, float multiplier)
         {
             return new HeroStats
             {
-                health = stats.health * multiplier,
-                attack = stats.attack * multiplier,
-                attackSpeed = stats.attackSpeed * multiplier,
+                // Core combat
+                hitPoints = stats.hitPoints * multiplier,
+                targets = stats.targets * multiplier,
+                hitSpeed = stats.hitSpeed * multiplier,
                 range = stats.range * multiplier,
-                armor = stats.armor * multiplier,
-                critChance = stats.critChance * multiplier,
-                critDamage = stats.critDamage * multiplier
+                damage = stats.damage * multiplier,
+                damagePerSec = stats.damagePerSec * multiplier,
+                count = stats.count * multiplier,
+                speed = stats.speed * multiplier,
+
+                // Attack
+                attackType = stats.attackType,
+                projectileSpeed = stats.projectileSpeed * multiplier,
+                attackArea = stats.attackArea * multiplier,
+
+                // Targeting
+                targetTeam = stats.targetTeam,
+                targetType = stats.targetType,
+                targetRestriction = stats.targetRestriction,
+                targetPreference = stats.targetPreference
             };
         }
     }

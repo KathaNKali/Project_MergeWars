@@ -56,6 +56,7 @@ codebase — see PROJECT_INDEX.md for build status.
   - ManaEconomy (CanAfford, Spend) — now the real implementation
   - GeneratorConfig (data reference) — replaces HeroClassConfig
   - HeroInstance (adds/sets on spawned hero at spawn time)
+  - HeroDefinition (prefab, `spawnHeightOffset`, via GeneratorConfig.heroPool)
   - MergeSystem (optional — adds/initializes HeroMergeInput on spawned hero if assigned)
   See SYS_Generator.md.
 
@@ -67,17 +68,24 @@ codebase — see PROJECT_INDEX.md for build status.
 
 - **HeroMergeInput** (`Assets/Scripts/Merge/HeroMergeInput.cs`) — attached
   to spawned heroes by Generator (or pre-authored on a hero prefab).
-  Depends on:
-  - GridManager (TryGetSlotIndexForOccupant)
+  Requires Collider + HeroInstance on the same GameObject. Depends on:
+  - GridManager (TryGetSlotIndexForOccupant, TryGetNearestOpenSlotIndex,
+    RemoveOccupant, PlaceOccupant, GetWorldPosition, CellSizeX/CellSizeZ)
   - MergeSystem (TryMerge)
+  - HeroInstance (GetComponent on the drop target)
+  Also uses Camera.main and the legacy Input API for pointer position.
   Implements both confirmed merge triggers (tap-tap-select and
   drag-and-drop) in a single component. See SYS_MergeSystem.md.
 
 - **GeneratorSpawner / GeneratorLoadout** (`Assets/Scripts/Generator/`) —
-  new this pass. `GeneratorSpawner` depends on:
+  `GeneratorSpawner` depends on:
   - GridManager (the Generator grid instance — `SetDimensions`,
     `TryGetOpenSlot`, `GetWorldPosition`, `PlaceOccupant`)
   - GeneratorLoadout (data reference — ordered `Generator[]` list)
+  - Generator (Instantiate + `Initialize(...)` on each spawned prefab)
+  - ManaEconomy, PoolManager, MergeSystem, and the Merge grid's
+    GridManager (scene references handed on to each Generator via
+    `Initialize`; GeneratorSpawner itself never calls them)
   Places Generator prefabs themselves into the Generator grid once at
   game start; distinct from Generator.TryTap() (which spawns heroes).
   See SYS_Generator.md.
@@ -90,22 +98,27 @@ Generator → PoolManager
 Generator → ManaEconomy (real)
 Generator → GeneratorConfig (data)
 Generator → HeroInstance (adds/sets on spawn)
+Generator → HeroDefinition (prefab, spawnHeightOffset)
 Generator → MergeSystem (optional, adds/initializes HeroMergeInput)
 GeneratorConfig → HeroDefinition (data, heroPool array)
 HeroInstance → HeroDefinition (definition reference)
 MergeSystem → GridManager (GetOccupant, RemoveOccupant)
 MergeSystem → PoolManager (Release)
 MergeSystem → HeroInstance (reads/mutates)
-HeroMergeInput → GridManager (TryGetSlotIndexForOccupant)
+HeroMergeInput → GridManager (TryGetSlotIndexForOccupant, TryGetNearestOpenSlotIndex, RemoveOccupant, PlaceOccupant, GetWorldPosition, CellSizeX/Z)
+HeroMergeInput → HeroInstance (drop-target lookup)
 HeroMergeInput → MergeSystem (TryMerge)
 GeneratorSpawner → GridManager (Generator grid — SetDimensions, TryGetOpenSlot, GetWorldPosition, PlaceOccupant)
 GeneratorSpawner → GeneratorLoadout (data)
+GeneratorSpawner → Generator (Instantiate, Initialize)
+GeneratorSpawner → ManaEconomy / PoolManager / MergeSystem / Merge-grid GridManager (references passed through to Generator.Initialize only)
 ManaEconomy → CurrencyEconomy (base class, not a runtime dependency edge)
 CoinEconomy → CurrencyEconomy (base class, not a runtime dependency edge)
 ```
 
-No other system currently depends on GridManager, PoolManager,
-ManaEconomy, or CoinEconomy — they are foundational/leaf-consumed only.
+Beyond the edges listed above, no other system depends on GridManager,
+PoolManager, ManaEconomy, or CoinEconomy — they are foundational/
+leaf-consumed only.
 CoinEconomy currently has no consumer at all (no spender/shop system
 exists yet) — expected, not a gap.
 
@@ -121,3 +134,5 @@ grants Mana/Coins on base destruction (both CurrencyEconomy subclasses
 intentionally have no `Add`-style method yet). These are referenced as
 future dependents/dependencies in the SYS_*.md "Depends on" sections but
 do not exist in code yet.
+
+_Synced with code in the doc-sync pass (edges above were reconciled against the C# source; HeroDefinitionValidator and GeneratorSetupTool were not re-read)._

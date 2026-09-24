@@ -15,6 +15,21 @@ namespace MergeWars.Generators
     [CreateAssetMenu(fileName = "GeneratorConfig", menuName = "MergeWars/Generator Config")]
     public class GeneratorConfig : ScriptableObject
     {
+        public enum GeneratorType
+        {
+            Tank,
+            Assassin,
+            Support,
+            Controller,
+            DamageDealer,
+            Marksman,
+            Artillery
+        }
+
+        public string barracksID;
+        public string barracksName;
+        public GeneratorType classType;
+
         // TODO(design): mana costs are ASSUMED PLACEHOLDER values — no
         // SYS_ManaEconomy.md or balance doc specifies real numbers yet.
         public int manaCost = 10;

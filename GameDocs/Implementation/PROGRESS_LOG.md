@@ -221,3 +221,68 @@ Append one entry per work session. Do not edit or delete prior entries.
   (10) is an ASSUMED PLACEHOLDER — no spec for tap-vs-drag sensitivity;
   the max-star constant (4) is hardcoded in `MergeSystem` rather than
   sourced from a shared config, since none exists yet.
+
+### Doc sync pass (reconstructed from docs and code)
+- Status: complete
+- Note: entries in this section were reconstructed by reading the current
+  docs and C# source, not from observing the work as it happened. No dates
+  or details beyond what the sources show are asserted.
+- What was done: Reconciled docs with code. Updated SYS_HeroDefinition.md
+  (current HeroStats fields, the five attack/targeting enums,
+  spawnHeightOffset, star-scaling caveat), SYS_Generator.md (removed retired
+  HeroClassConfig/Ground-Air-Vehicles and ManaEconomy-stub text; documented
+  GeneratorConfig fields, spawnHeightOffset use, GeneratorSpawner details),
+  SYS_ManaEconomy.md (HeroClassConfig -> GeneratorConfig reference),
+  SYS_GridManager.md (fixed truncated line and encoding artifacts;
+  documented anchor-as-center, independent cell size, merge-area overflow
+  warning, OnValidate, gizmos, CellSizeX/Z), SYS_MergeSystem.md (virtual
+  drag plane, SmoothDamp, trigger-collider toggle, RaycastAll ignoring self,
+  Camera.main/legacy Input, reposition behavior), SYSTEM_MAP.md (missing
+  edges), PROJECT_INDEX.md (last-updated line, stale mana-cost unknown,
+  new unknowns), CURRENT_TASK.md (duplicate title line only).
+- What's left: GeneratorSetupTool.cs and HeroDefinitionValidator.cs were not
+  re-read. Design docs (GAME_DESIGN_GENERATOR_VARIANT.md, GAMEPLAY_LOOPS.md,
+  DECISIONS_LOG.md, IMPLEMENTATION_PLAN.md) were not provided. Nothing was
+  compiled or run in Unity.
+- TODO(design) markers: none added to code (docs only).
+
+### GeneratorSpawner / GeneratorLoadout + GridData multi-grid (reconstructed)
+- Status: complete (per docs/code)
+- What was done: GridManager slot logic extracted into plain C# GridData;
+  GridManager is a per-instance MonoBehaviour wrapper with SetDimensions().
+  GeneratorLoadout (ScriptableObject) and GeneratorSpawner place Generator
+  prefabs into a dedicated Generator grid at Start(), wiring scene
+  dependencies via Generator.Initialize(...).
+- What's left: layout beyond one row and player-selection mapping onto
+  GeneratorLoadout are unresolved.
+- TODO(design): single-row layout in GeneratorSpawner is an ASSUMED
+  PLACEHOLDER.
+
+### Strategic hero repositioning (reconstructed)
+- Status: complete (per docs/code)
+- What was done: HeroMergeInput drag release now (1) merges if over another
+  hero, (2) else moves to the nearest open slot via
+  GridManager.TryGetNearestOpenSlotIndex, (3) else snaps back. Tap-tap-select
+  remains merge-only.
+- What's left: repositioned heroes do not apply spawnHeightOffset; a failed
+  merge drop can fall through to repositioning - both unconfirmed as
+  intended.
+
+### Drag-feel changes in HeroMergeInput (reconstructed)
+- Status: complete (per code)
+- What was done: dragging uses a fixed-height virtual plane
+  (dragHeightOffset), SmoothDamp movement (dragSmoothTime), a temporary
+  trigger collider, and RaycastAll ignoring the hero's own collider.
+- TODO(design): dragHeightOffset (0.5) and dragSmoothTime (0.06) are
+  ASSUMED PLACEHOLDERS.
+
+### HeroStats expansion and attack/targeting enums (reconstructed)
+- Status: complete (per code)
+- What was done: HeroStats now carries hitPoints, targets, hitSpeed, range,
+  damage, damagePerSec, count, speed, attackType, projectileSpeed,
+  attackArea plus targetTeam/targetType/targetRestriction/targetPreference.
+  Enums (AttackType, TargetTeam, TargetType, TargetRestriction,
+  TargetPreference) are declared in HeroStats.cs. HeroDefinition gained
+  spawnHeightOffset.
+- What's left: intended per-field star scaling, overlap between the
+  targeting enums, and GeneratorType vs HeroRole are unresolved.

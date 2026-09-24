@@ -1,5 +1,4 @@
 # CURRENT_TASK.md
-# CURRENT_TASK.md
 
 ## Active task
 Strategic hero repositioning built (see SYS_MergeSystem.md): dragging a

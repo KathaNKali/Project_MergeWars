@@ -1,135 +1,137 @@
-## Confirmed this pass
+# SYS_Generator.md - Generator Variant
+
+_Synced with code: Generator.cs, GeneratorConfig.cs, GeneratorSpawner.cs, GeneratorLoadout.cs. `GeneratorSetupTool.cs` was not re-read this pass._
+
+## Confirmed
 - CONFIRMED: Generator is a 3D world object on the battlefield (not UI),
-  positioned outside/below the grid, tapped via Physics.Raycast — consistent
-  with MergeSystem's drag/drop input model and Touchdown-style camera framing.
+  positioned outside/below the grid, tapped via Physics.Raycast -
+  consistent with MergeSystem's drag/drop input model and Touchdown-style
+  camera framing.
 - CONFIRMED: spawned hero is instantiated via PoolManager (see
   SYS_PoolManager.md), not raw Instantiate(). Generator requests an object
   from the pool, does not own or track it after handing it to GridManager.
-- CONFIRMED: spawned hero is parented to a champions container (or the grid),
-  never to the Generator itself — Generator's involvement ends at spawn.
+- CONFIRMED: spawned hero is parented to a champions container (or the
+  grid), never to the Generator itself - Generator's involvement ends at
+  spawn.
 
-## Depends on (updated)
-- ManaEconomy (CanAfford, spend)
-- GridManager (TryGetOpenSlot, PlaceOccupant, GetWorldPosition)
-- PoolManager (request pooled hero instance by prefab)
-- Config: GeneratorConfig (ScriptableObject — manaCost, heroPool of HeroDefinition[]) — replaces the retired HeroClassConfig
-- HeroDefinition (per-hero data asset — see SYS_HeroDefinition.md) and HeroInstance (MonoBehaviour set on the spawned hero at spawn time)
-- MergeSystem (optional — see SYS_MergeSystem.md) — if assigned, Generator also adds/initializes a HeroMergeInput component on the spawned hero so it becomes mergeable
+## Depends on
+- ManaEconomy (CanAfford, Spend) - the real implementation (see
+  SYS_ManaEconomy.md)
+- GridManager (TryGetOpenSlot, PlaceOccupant, GetWorldPosition) - the
+  Merge grid instance
+- PoolManager (Get)
+- GeneratorConfig (ScriptableObject - manaCost, heroPool of
+  HeroDefinition[])
+- HeroDefinition (per-hero data asset - see SYS_HeroDefinition.md) and
+  HeroInstance (MonoBehaviour set on the spawned hero at spawn time)
+- MergeSystem (optional - see SYS_MergeSystem.md) - if assigned, Generator
+  also adds/initializes a HeroMergeInput on the spawned hero so it becomes
+  mergeable
 
-## Wiring scene-object dependencies when Generator is spawned from a prefab (new this pass)
-- CONFIRMED: `gridManager`, `manaEconomy`, `poolManager`, `championsContainer`,
-  and `mergeSystem` are all scene objects/references. A prefab **asset**
-  cannot itself hold a reference to a scene object, so a Generator
-  instantiated from a prefab (e.g. by GeneratorSpawner) always starts
-  with these fields empty — they must be assigned at runtime.
-- `Generator.Initialize(GridManager gridManager, ManaEconomy manaEconomy, PoolManager poolManager, Transform championsContainer, MergeSystem mergeSystem = null)`
-  was added for this — same pattern already used by
+## Implementation notes
+- Location: `Assets/Scripts/Generator/Generator.cs` (namespace
+  `MergeWars.Generators`), MonoBehaviour,
+  `[RequireComponent(typeof(Collider))]` so it is raycast-hittable.
+- `TryTap()` order: (0) `config`, `gridManager`, `manaEconomy`,
+  `poolManager` must all be assigned, else no-op; (1)
+  `ManaEconomy.CanAfford(config.manaCost)` - false is a no-op, no mana
+  spent; (2) `GridManager.TryGetOpenSlot()` - none is a no-op, no mana
+  spent; (3) `config.GetRandomHeroDefinition()` - null definition or null
+  `definition.prefab` is a no-op, no mana spent; (4) spend mana,
+  `PoolManager.Get(definition.prefab)`, reparent to `championsContainer`
+  (never the Generator's own transform), position at
+  `GridManager.GetWorldPosition(slot) + Vector3.up *
+  definition.spawnHeightOffset`, get-or-add `HeroInstance` and set
+  `definition` + `starLevel = 1`, optionally get-or-add and initialize
+  `HeroMergeInput`, then `GridManager.PlaceOccupant(slot, hero)`.
+- KNOWN EDGE (not changed, flagged): mana is spent before
+  `PoolManager.Get` returns; if `Get` returns null, `TryTap()` returns
+  false after mana was already spent.
+- Tap entry point is `OnMouseDown()` (Unity's built-in Physics.Raycast-
+  based mouse dispatch against the required Collider). `TryTap()` is
+  public so a future input dispatcher can call it directly.
+- No unlock check exists in code, per spec - not even a stub.
+- If the optional `mergeSystem` field is assigned, spawned heroes get a
+  `HeroMergeInput` wired via `Initialize(gridManager, mergeSystem)`
+  (tap-tap-select and drag-and-drop - see SYS_MergeSystem.md). If left
+  unassigned, spawned heroes have no merge input; the spawn flow is
+  unaffected.
+- **GeneratorConfig** (`Assets/Scripts/Generator/GeneratorConfig.cs`):
+  - `int manaCost` (default 10 - ASSUMED PLACEHOLDER; stays on this
+    generator-side wrapper, not per-hero)
+  - `HeroDefinition[] heroPool` - one chosen at random each spawn via
+    `GetRandomHeroDefinition()`; empty/null pool means `TryTap()` no-ops
+    before spending mana.
+  - `string barracksID`, `string barracksName`, and
+    `GeneratorType classType` (nested enum: Tank, Assassin, Support,
+    Controller, DamageDealer, Marksman, Artillery). These are metadata
+    only - nothing in the current code reads them. Their relationship to
+    `HeroRole` is undocumented (see Open Unknowns).
+- **RETIRED:** `HeroClassConfig` / `HeroClassId` (Ground/Air/Vehicles) were
+  replaced by `GeneratorConfig` + `HeroDefinition`/`HeroRole`. Heroes are
+  authored individually as `HeroDefinition` assets. The old per-class mana
+  costs (Ground 10 / Air 15 / Vehicles 20) no longer apply.
+- `Assets/Editor/GeneratorSetupTool.cs` (menu: `MergeWars/Setup/Create
+  Placeholder Hero Assets`) creates placeholder `HeroDefinition` assets
+  and a sample `GeneratorConfig`. NOT re-read this pass; it may need
+  updating for the current `HeroStats` fields and `GeneratorConfig`
+  fields (see Not verified).
+
+## Wiring scene-object dependencies when Generator is spawned from a prefab
+- CONFIRMED: `gridManager`, `manaEconomy`, `poolManager`,
+  `championsContainer`, and `mergeSystem` are scene objects. A prefab
+  asset cannot hold a reference to a scene object, so a Generator
+  instantiated from a prefab always starts with these fields empty.
+- `Generator.Initialize(GridManager gridManager, ManaEconomy manaEconomy,
+  PoolManager poolManager, Transform championsContainer, MergeSystem
+  mergeSystem = null)` wires them at runtime - same pattern as
   `HeroMergeInput.Initialize(...)`. Whoever instantiates a Generator
-  prefab is responsible for calling this immediately after
-  `Instantiate()`.
-- Hand-placed/scene-authored Generator instances (not spawned via
-  GeneratorSpawner) can instead assign these fields directly in the
-  Inspector on that scene instance (a per-instance prefab override) and
-  skip calling `Initialize`.
+  prefab must call it immediately after `Instantiate()`.
+- Hand-placed scene Generators can instead assign these in the Inspector
+  and skip `Initialize`.
 
-## GeneratorSpawner (new this pass — game-start placement of Generators themselves)
-- CONFIRMED: a separate concern from Generator.TryTap() (which spawns
-  heroes into a grid when a Generator is tapped). GeneratorSpawner
-  instead places Generator *prefabs themselves* into slots on a dedicated
+## GeneratorSpawner (game-start placement of Generators themselves)
+- CONFIRMED: separate from `Generator.TryTap()` (which spawns heroes).
+  GeneratorSpawner places Generator *prefabs* into slots on a dedicated
   Generator grid (a second GridManager instance, separate from the Merge
   grid) once, at game start.
 - Location: `Assets/Scripts/Generator/GeneratorSpawner.cs`,
   `GeneratorLoadout.cs` (namespace `MergeWars.Generators`).
-- `GeneratorLoadout` (ScriptableObject) is authored config data only — an
-  ordered `Generator[] generatorPrefabs` array. GeneratorSpawner reads it
-  at `Start()` and never writes back to it. Not a stand-in for a
-  player-selection system yet — see Open Unknowns below.
+- `GeneratorLoadout` (ScriptableObject) - authored config only: an
+  ordered `Generator[] generatorPrefabs`. Read at `Start()`, never
+  written back. Not a player-selection system.
 - `GeneratorSpawner` (MonoBehaviour): serialized refs to the Generator
-  grid's `GridManager`, a `GeneratorLoadout`, and the Merge-side scene
-  objects each spawned Generator needs (`mergeGridManager`,
-  `manaEconomy`, `poolManager`, `championsContainer`, optional
-  `mergeSystem`). At `Start()`: resizes the Generator grid via
-  `GridManager.SetDimensions(rows, columns)` — ASSUMED PLACEHOLDER
-  layout is 1 row × (generator count) columns — then for each prefab in
-  order: `Instantiate()`s it directly (no PoolManager — one-time spawn,
-  not repeatedly created/destroyed), positions it via
-  `GridManager.GetWorldPosition(slot)`, calls
-  `Generator.Initialize(mergeGridManager, manaEconomy, poolManager, championsContainer, mergeSystem)`
-  to wire its scene-object dependencies (see "Wiring scene-object
-  dependencies" above), and calls `GridManager.PlaceOccupant(slot, instance)`.
-- `GridManager.SetDimensions(int rows, int columns)` was added to
-  GridManager to support this — it only resizes+rebuilds; GridManager
-  still has no knowledge of *why* a caller wants a given size (sizing
-  policy stays outside GridManager, per SYS_GridManager.md).
-- UNKNOWN / ASSUMED PLACEHOLDER (flagged for follow-up):
-  - Layout beyond a single row (e.g. wrapping to multiple rows once
-    generator count grows) is not designed yet.
-  - How "whatever the player has chosen" maps onto `GeneratorLoadout` is
-    unresolved — currently it's just a static authored list of every
-    generator to spawn. A future selection/save system may swap which
-    `GeneratorLoadout` asset is assigned, or supply a runtime-filtered
-    list instead; `GeneratorLoadout` itself is not intended to hold
-    mutable per-session selection state.
+  grid's `GridManager` (`generatorGridManager`), a `GeneratorLoadout`,
+  `generatorsContainer`, and the Merge-side scene objects each spawned
+  Generator needs (`mergeGridManager`, `manaEconomy`, `poolManager`,
+  `championsContainer`, optional `mergeSystem`).
+  - `Start()` calls public `SpawnLoadout()`. Logs a warning and no-ops if
+    the grid manager, loadout, or prefab list is missing/empty.
+  - Resizes the Generator grid via `GridManager.SetDimensions(1, count)`
+    (ASSUMED PLACEHOLDER layout), then per prefab in order: skips null
+    entries, gets an open slot (warns and stops if none),
+    `Instantiate()`s directly (no PoolManager - one-time spawn), sets
+    position from `GetWorldPosition(slot)`, calls `Generator.Initialize(
+    mergeGridManager, manaEconomy, poolManager, championsContainer,
+    mergeSystem)`, and `PlaceOccupant(slot, instance.gameObject)`.
+  - Note: `SpawnLoadout()` is public and can be called twice; it does not
+    clear previously spawned generators or reset the Generator grid's
+    occupants. Not guarded - flagged.
+- `GridManager.SetDimensions(int rows, int columns)` only resizes and
+  rebuilds; sizing policy stays outside GridManager.
 
-## Implementation notes (added after PoolManager + Generator build)
-- Location: `Assets/Scripts/Generator/Generator.cs` (namespace
-  `MergeWars.Generators`), MonoBehaviour, `[RequireComponent(typeof(Collider))]`
-  so it's guaranteed raycast-hittable.
-- `TryTap()` implements the confirmed order exactly: (1)
-  `ManaEconomy.CanAfford(config.manaCost)` — false is a no-op, no mana
-  spent; (2) `GridManager.TryGetOpenSlot()` — none is a no-op, no mana
-  spent; (3) both pass → spend mana, `PoolManager.Get(config.heroPrefab)`,
-  reparent to a serialized `championsContainer` (never the Generator's own
-  transform), position via `GridManager.GetWorldPosition(slot)`, then
-  `GridManager.PlaceOccupant(slot, hero)`.
-- Tap entry point is `OnMouseDown()` (Unity's built-in
-  Physics.Raycast-based mouse dispatch against the required Collider).
-  `TryTap()` itself is public so a future dedicated input dispatcher can
-  call it directly instead, without changing Generator's internals.
-- No unlock check exists in code, per spec — not even a stub.
-- **RETIRED:** `HeroClassConfig`/`HeroClassId` (Ground/Air/Vehicles) have
-  been replaced — see SYS_HeroDefinition.md. Heroes are now authored
-  individually as `HeroDefinition` assets (one per hero), each carrying its
-  own `heroId`, `HeroRole` (Tank/MeleeDps/RangedDps/Support/Controller),
-  `HeroStats`, and `prefab` reference.
-- `GeneratorConfig` implemented at `Assets/Scripts/Generator/GeneratorConfig.cs`
-  with `int manaCost` (stays on this generator-side wrapper, not per-hero)
-  and `HeroDefinition[] heroPool` — a generator can hold multiple different
-  heroes; `GeneratorConfig.GetRandomHeroDefinition()` picks one at random
-  each time the generator spawns (same random-selection behavior as
-  before, now at the individual-hero level). If the pool is empty/null,
-  `TryTap()` no-ops before spending mana.
-- `Generator.TryTap()` now also gets-or-adds a `HeroInstance` component on
-  the spawned hero GameObject and sets `definition` (the chosen
-  `HeroDefinition`) and `starLevel = 1` before placing it into the grid —
-  this is the occupant identity component MergeSystem reads/mutates.
-- If `Generator`'s optional `mergeSystem` field is assigned, `TryTap()`
-  also gets-or-adds a `HeroMergeInput` component on the spawned hero and
-  calls `Initialize(gridManager, mergeSystem)` on it, wiring up both
-  confirmed merge input triggers (tap-tap-select and drag-and-drop — see
-  SYS_MergeSystem.md). If `mergeSystem` is left unassigned, spawned heroes
-  simply have no merge input; Generator's spawn flow is unaffected either
-  way.
-- `Assets/Editor/GeneratorSetupTool.cs` (menu: `MergeWars/Setup/Create
-  Placeholder Hero Assets`) updated accordingly — creates placeholder
-  `HeroDefinition` assets (one per placeholder prefab, each with a unique
-  `heroId` and `HeroRole`) plus a sample `GeneratorConfig` referencing them,
-  at `Assets/Configs/Heroes/*.asset` and
-  `Assets/Configs/Generators/GeneratorConfig_Placeholder.asset`. Uses the
-  same real Unity APIs as before (`GameObject.CreatePrimitive`,
-  `PrefabUtility.SaveAsPrefabAsset`, `ScriptableObject.CreateInstance`).
-- `// TODO(design)` markers left in code:
-  - `HeroClassConfig.manaCost` default (10) and the per-class values the
-    setup tool assigns (Ground 10 / Air 15 / Vehicles 20) are ASSUMED
-    PLACEHOLDER — no balance doc specifies real numbers.
-  - `ManaEconomy` (see below) is a stub, not the real system.
+## Open Unknowns
+- Generator grid layout beyond a single row (wrapping to multiple rows) is
+  not designed.
+- How "whatever the player has chosen" maps onto `GeneratorLoadout` is
+  unresolved (swap the assigned asset vs. a runtime-filtered list).
+- `GeneratorConfig.manaCost` default (10) and any per-generator values are
+  ASSUMED PLACEHOLDERS - no balance doc specifies real numbers.
+- `GeneratorConfig.GeneratorType` / `classType` vs `HeroRole`: how they
+  relate, and whether `classType` should constrain `heroPool`, is
+  undocumented.
+- `barracksID` uniqueness/usage is undefined (no validator, no consumer).
 
-## Dependency stub note
-- No `SYS_ManaEconomy.md` exists yet anywhere in `/GameDocs/`, so
-  `ManaEconomy` does not exist as a real system. A minimal stub was added
-  at `Assets/Scripts/Economy/ManaEconomy.cs` covering only
-  `CanAfford(int)` / `Spend(int)` and a serialized starting mana value —
-  marked `// TODO(design): replace with real ManaEconomy per
-  SYS_ManaEconomy.md` once that doc and system exist. Generator depends on
-  this stub's public interface only, so swapping in the real
-  implementation later should not require Generator changes.
+## Not verified
+- `GeneratorSetupTool.cs` was not shared this pass. Nothing was compiled
+  or run in Unity.

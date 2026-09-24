@@ -14,3 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Generators.GeneratorLoadout
   generatorPrefabs:
   - {fileID: 2460528965253972928, guid: 0aac96e21f8975342948974270f07d64, type: 3}
+  - {fileID: 2460528965253972928, guid: 0aac96e21f8975342948974270f07d64, type: 3}
+  - {fileID: 2460528965253972928, guid: 0aac96e21f8975342948974270f07d64, type: 3}
+  - {fileID: 2460528965253972928, guid: 0aac96e21f8975342948974270f07d64, type: 3}
+  - {fileID: 2460528965253972928, guid: 0aac96e21f8975342948974270f07d64, type: 3}

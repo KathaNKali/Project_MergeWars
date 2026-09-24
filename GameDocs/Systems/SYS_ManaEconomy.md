@@ -58,6 +58,7 @@ toward the next upgrade tier.
 - Starting `currentAmount`, starting `maxCap`, and all upgrade tier
   `cost`/`newMaxCap` values are ASSUMED PLACEHOLDERS — no balance doc
   specifies real numbers.
-- Real per-class hero mana costs (`HeroClassConfig.manaCost`) are still
-  placeholders (see SYS_Generator.md) — unrelated to this file's own
+- Real per-generator hero mana costs (`GeneratorConfig.manaCost`, default 10) are still
+  placeholders (see SYS_Generator.md) - unrelated to this file's own
   Unknowns but worth resolving together during a real balance pass.
+  (Previously referred to the retired `HeroClassConfig.manaCost`.)

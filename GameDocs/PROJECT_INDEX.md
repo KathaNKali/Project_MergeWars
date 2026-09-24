@@ -1,6 +1,6 @@
 # PROJECT_INDEX.md — Merge Wars (Generator Variant)
 
-Last updated: this pass (MergeSystem build — tap-tap-select + drag-and-drop merge input, heroId + starLevel matching, max 4-star cap).
+Last updated: doc-sync pass (docs reconciled with code: expanded HeroStats + attack/targeting enums, GeneratorSpawner/GridData multi-grid, drag-feel changes, strategic repositioning).
 
 ## Note on this file's origin
 This file did not exist before the PoolManager + Generator task. It was
@@ -73,9 +73,9 @@ flagged for human follow-up, not fabricated here.
 - Starting amounts, starting max caps, and all upgrade tier cost/newMaxCap
   values for both currencies are ASSUMED PLACEHOLDERS — no balance doc
   specifies real numbers.
-- Real per-class hero mana costs are unknown; setup tool assigns
-  placeholder values (Ground 10 / Air 15 / Vehicles 20) via
-  `Assets/Editor/GeneratorSetupTool.cs`.
+- Real per-generator hero mana costs are unknown; `GeneratorConfig.manaCost`
+  defaults to 10 (ASSUMED PLACEHOLDER). The old Ground/Air/Vehicles values
+  belonged to the retired `HeroClassConfig`.
 - GridManager's `columnAxis`/`rowAxis` world-direction convention is still
   an ASSUMED PLACEHOLDER (carried over from the GridManager task).
 - `GameDocs/GAME_DESIGN_GENERATOR_VARIANT.md`, `GameDocs/GAMEPLAY_LOOPS.md`,
@@ -85,6 +85,28 @@ flagged for human follow-up, not fabricated here.
 - TopDown Engine / FEEL / DoTween integration points are UNKNOWN (see Tech
   Stack section below) — none of these packages are referenced in code
   yet; confirm scope per-system as each comes up.
+- `HeroDefinition.spawnHeightOffset` (0.5), `HeroMergeInput.dragHeightOffset`
+  (0.5) and `dragSmoothTime` (0.06) are ASSUMED PLACEHOLDERS. Repositioned
+  heroes snap to the slot position WITHOUT `spawnHeightOffset` (see
+  SYS_MergeSystem.md) - unconfirmed whether intended.
+- `HeroStats` was expanded (hitPoints, targets, hitSpeed, damage,
+  damagePerSec, count, speed, attackType, projectileSpeed, attackArea + four
+  targeting enums). `HeroStats.Multiply` scales every numeric field per star;
+  intended per-field scaling (e.g. hitSpeed, targets, count) is UNCONFIRMED.
+- `TargetType`, `TargetRestriction` and `TargetPreference` overlap
+  conceptually (ground/air/buildings); how they combine is undocumented.
+  The enums live in `HeroStats.cs`; splitting them out is deferred until
+  another system consumes them.
+- `GeneratorConfig.GeneratorType` (Tank, Assassin, Support, Controller,
+  DamageDealer, Marksman, Artillery) vs `HeroRole` - relationship
+  undocumented; `barracksID`/`barracksName`/`classType` have no consumer.
+- `HeroMergeInput` uses the legacy `Input` API and `Camera.main`; the
+  project's active input backend is undocumented.
+- `GeneratorSetupTool.cs` and `HeroDefinitionValidator.cs` were not re-read
+  during the doc sync; `GeneratorSetupTool` may not compile against the
+  current `HeroStats`/`GeneratorConfig` fields.
+- `GameDocs/IMPLEMENTATION_PLAN.md` is referenced by workflow instructions
+  but was not provided.
 
 ## Logical next step
 GridManager, PoolManager, ManaEconomy, CoinEconomy, the Hero Character
