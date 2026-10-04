@@ -232,6 +232,7 @@ Transform:
   - {fileID: 1053274651}
   - {fileID: 1658988515}
   - {fileID: 2075556531}
+  - {fileID: 1802425878}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &164188470
@@ -600,6 +601,7 @@ MonoBehaviour:
   poolManager: {fileID: 1053274652}
   championsContainer: {fileID: 432370272}
   mergeSystem: {fileID: 2075556530}
+  laneBounds: {fileID: 1802425879}
 --- !u!1001 &497709002
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1766,6 +1768,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1137535785635986062, guid: cb2be75ff9838bd4d874077280b5c07c,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.3392396
+      objectReference: {fileID: 0}
+    - target: {fileID: 1141651450768826682, guid: cb2be75ff9838bd4d874077280b5c07c,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.3392396
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1962,6 +1974,56 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1801816265}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1802425877
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1802425878}
+  - component: {fileID: 1802425879}
+  m_Layer: 0
+  m_Name: LaneBounds_Merge
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1802425878
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802425877}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.6, y: 0, z: 11.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 73828932}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1802425879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802425877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe47d9c47bd7c432eb41a5dc45f96b23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Lanes.LaneBounds
+  laneCount: 2
+  laneWidth: 12
+  anchor: {fileID: 0}
+  laneAxis: {x: 1, y: 0, z: 0}
+  drawDebugGizmo: 1
+  gizmoCorridorDepth: 40
 --- !u!1 &1825840474
 GameObject:
   m_ObjectHideFlags: 0
@@ -2006,11 +2068,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c96f708e9949da4ea7629efd692b231, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Grid.GridManager
-  rows: 5
-  columns: 5
+  rows: 8
+  columns: 8
   anchor: {fileID: 1118980007}
   cellSizeX: 2
-  cellSizeZ: 1.5
+  cellSizeZ: 1.2
   mergeAreaWidth: 30
   mergeAreaDepth: 10
   columnAxis: {x: 1, y: 0, z: 0}
@@ -2289,6 +2351,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Merge.MergeSystem
   gridManager: {fileID: 1825840476}
   poolManager: {fileID: 1053274652}
+  laneBounds: {fileID: 1802425879}
 --- !u!4 &2075556531
 Transform:
   m_ObjectHideFlags: 0

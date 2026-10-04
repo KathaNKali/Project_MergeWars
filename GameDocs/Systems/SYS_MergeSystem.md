@@ -1,135 +1,121 @@
-# SYS_GridManager.md - Generator Variant
+# SYS_MergeSystem.md - Generator Variant
 
-_Synced with code: GridManager.cs, GridData.cs, GridSlotData.cs._
+_Synced with code: MergeSystem.cs, HeroMergeInput.cs. Regenerated from
+source - the previous version of this file was corrupted (contained
+duplicated SYS_GridManager.md content)._
 
 ## Responsibility
-Owns an M x N grid data structure (dimensions configurable, not fixed) and
-slot <-> world-position mapping for a grid zone. The grid's world
-origin/anchor is placeable (author sets a transform; grid builds
-relative to it - not hardcoded to a scene position). Grid starts EMPTY on
-first play. Grid state carries over between bases (not reset on
-level-clear, per variant design).
+`MergeSystem`: central merge validation/execution logic, decoupled from
+input - input triggers call `TryMerge(slotIndexA, slotIndexB)` and it does
+not know how the merge was triggered. `HeroMergeInput`: single input
+component that resolves both confirmed merge triggers (tap-tap-select,
+drag-and-drop) into slot indices and calls into `MergeSystem` - it does
+not implement merge validity itself.
 
-**GridManager is a per-instance grid, not a singleton.** Multiple
-GridManager components can exist in the scene simultaneously, each an
-independent grid with its own dimensions/anchor/cell size - e.g. a Merge
-grid and a Generator grid. Consumers (Generator, GeneratorSpawner,
-MergeSystem, HeroMergeInput) each hold an explicit serialized reference to
-the specific GridManager instance they operate on; there is no
-shared/global grid lookup.
-
-The slot-array data structure and its lookup/mutation logic
-(TryGetOpenSlot, PlaceOccupant, RemoveOccupant, GetOccupant,
-TryGetSlotIndexForOccupant, TryGetNearestOpenSlotIndex, GetWorldPosition,
-and slot-array construction) live in a plain C# `GridData` class
-(`Assets/Scripts/Grid/GridData.cs`), not in GridManager itself.
-GridManager is a thin MonoBehaviour wrapper: it holds the Inspector-facing
-configuration (rows, columns, anchor, cell size, merge area reference
-bounds, axis convention, debug gizmo) and an internal `GridData`
-instance, and forwards slot API calls to it. This split keeps grid
-data/logic reusable across independently configured grid instances and
-separate from MonoBehaviour/presentation concerns.
-
-## Cell generation order (CONFIRMED)
-Cells are indexed starting at the top-right corner, filling right-to-left
-across the top row first, then proceeding downward row by row
-(`slotIndex = row * columns + colFromRight`). This is an indexing
-convention only - it does not imply any gameplay rule about slot priority
-(`TryGetOpenSlot()` is a plain linear scan and is not required to follow
-this order).
-
-## Default configuration
-- Default: 4x4 (16 slots). Rows/columns are runtime-configurable per
-  instance; nothing hardcodes 4x4 into the class itself.
-
-## Anchor, cell size, and merge area (matches code)
-- The `anchor` transform represents the CENTER of the grid/merge area (not
-  a corner). The grid is always built centered on it (offsets computed
-  from the center index `(count-1)/2`), regardless of row/column count. If
-  no anchor is assigned, the GridManager's own transform is used.
-- Cell size is INDEPENDENT of the merge area (`cellSizeX` along the column
-  axis, `cellSizeZ` along the row axis; exposed as `CellSizeX`/`CellSizeZ`).
-  The grid does not auto-fit or clamp.
-- `mergeAreaWidth` / `mergeAreaDepth` are reference bounds only. If the
-  grid's footprint (`columns * cellSizeX`, `rows * cellSizeZ`) exceeds
-  them, `BuildGrid()` logs a warning (`CheckMergeAreaOverflow`) - nothing
-  is resized. Defaults: 4 x 4.
-- `OnValidate()` rebuilds the grid in the editor whenever rows/columns are
-  positive, so Inspector edits are reflected immediately.
+## Confirmed
+- CONFIRMED: Match rule - two heroes merge if
+  `HeroInstance.definition.heroId` matches exactly AND `starLevel`
+  matches (not prefab/reference identity). No adjacency requirement.
+- CONFIRMED: Max star level is 4 (hardcoded `const` in `MergeSystem` - no
+  shared config exists yet). Merging two max-star heroes is a no-op.
+- CONFIRMED: Destination of a merge is always `slotIndexB` (the
+  second-tapped hero, or the drag's drop target) - it receives the +1
+  `starLevel`. The source (`slotIndexA`) is removed from the grid and
+  released back to `PoolManager`. The destination hero's GameObject/
+  position never changes during a merge - only its `starLevel` (and, if
+  `LaneBounds` is assigned, its re-queried `laneIndex`) is mutated.
+- CONFIRMED: tap-tap-select and drag-and-drop are handled by the SAME
+  component (`HeroMergeInput`) because Unity's `OnMouseDown`/
+  `OnMouseDrag`/`OnMouseUp` dispatch is per-GameObject; tap vs. drag is
+  disambiguated by total mouse movement distance during the press
+  (`dragThresholdPixels`).
+- CONFIRMED: Drag release priority order (strategic hero repositioning
+  pass): (1) drop on another hero -> attempt merge; (2) drop near an open
+  (unoccupied) slot -> move there instead (updates `GridManager` occupant
+  data, snaps to the slot's exact world position, not the raw drop
+  point); (3) otherwise -> snap back to the original position, unchanged
+  (no tween - DoTween not yet integrated).
+- CONFIRMED: tap-tap-select is merge-only - empty grid space has no
+  component to receive a tap, so there is no tap-to-move equivalent of
+  strategic repositioning.
+- CONFIRMED: while dragging, the hero's own collider is switched to a
+  trigger so it can pass over other heroes without physical collision,
+  and restored to its original trigger state on release/disable.
+- CONFIRMED: drag movement is resolved against a flat virtual plane at a
+  fixed height (`originalWorldPosition.y + dragHeightOffset`), not real
+  ground geometry, so the hero never bobs vertically while dragged.
 
 ## Depends on
-- Nothing at runtime. (Generators, GeneratorSpawner, MergeSystem and
-  HeroMergeInput depend on it.)
-- Future: LevelProgression / base-transition logic will read current grid
-  state to carry it into the next base (does NOT reset grid on base
-  clear).
+- GridManager (`GetOccupant`, `RemoveOccupant`, `PlaceOccupant`,
+  `TryGetSlotIndexForOccupant`, `TryGetNearestOpenSlotIndex`,
+  `GetWorldPosition`, `CellSizeX`/`CellSizeZ`)
+- PoolManager (`Release`)
+- HeroInstance (reads `definition.heroId` + `starLevel`, mutates
+  `starLevel`; `HeroMergeInput` also caches its own `HeroInstance` to
+  write `laneIndex`)
+- LaneBounds (optional, see /GameDocs/Systems/SYS_LaneSystem.md) -
+  `MergeSystem` re-queries and updates the surviving hero's `laneIndex`
+  after a successful merge; `HeroMergeInput` re-queries and updates
+  `laneIndex` after a drag-to-open-slot reposition. Both no-op if
+  unassigned.
 
 ## Does NOT know about
-- Merge/swap validity rules (MergeSystem's job)
-- Mana cost of spawning (ManaEconomy's job)
+- Economy/mana cost (ManaEconomy's job)
 - Combat, base layout
-- Whether a slot's occupant is "unlocked" (generator/unlock system's
-  concern)
-- Why a caller wants a given size (`SetDimensions` only resizes/rebuilds)
-
-## Confirmed / Assumed
-- CONFIRMED: grid dimensions are M x N, configurable per instance; 4x4 is
-  the default.
-- CONFIRMED: grid origin is placeable (author-positioned transform).
-- CONFIRMED: cell generation order is top-right start, right-to-left
-  across the top row, then downward.
-- CONFIRMED (carried forward): starts empty, persists base-to-base, empty
-  during combat.
-- ASSUMED PLACEHOLDER: which local axis relative to the anchor represents
-  "column increases to the right" / "row increases downward" -
-  serialized `columnAxis` (default `Vector3.right`) and `rowAxis` (default
-  `Vector3.back`), applied through `anchor.TransformDirection`. Flagged
-  `// TODO(design)` in `GridManager.cs`.
-- UNKNOWN: whether any future system (targeting, visual scan effects)
-  will need per-cell colliders or per-cell GameObjects. (This line was
-  truncated in the previous version of this doc; the original
-  continuation is not recoverable from the sources provided.)
+- Generator (how/where a hero was spawned)
+- How the player selected the two heroes (tap vs. drag) - `MergeSystem`
+  only receives two slot indices
+- The movement/march system (not built) that would consume a hero's
+  `laneIndex`
 
 ## Implementation notes
-- Location: `Assets/Scripts/Grid/GridManager.cs`, `GridData.cs`,
-  `GridSlotData.cs` (namespace `MergeWars.Grid`).
-- Grid data is a plain array of `GridSlotData` (slotIndex, row, col,
-  worldPosition, occupant, isOccupied) - no per-cell GameObjects. If
-  future raycast/drag-drop targeting requires per-cell colliders, add a
-  pooled GameObject layer on top of this data rather than instantiating on
-  tap.
-- Occupant reference type is a bare `GameObject` (`// TODO(design)` in
-  `GridSlotData.cs`) since no richer occupant contract exists.
-- API surface on GridManager (all delegate to `GridData`, except where
-  noted): `TryGetOpenSlot`, `PlaceOccupant`, `RemoveOccupant`,
-  `GetOccupant`, `TryGetSlotIndexForOccupant`, `GetWorldPosition`
-  (falls back to the anchor/own position if the index is invalid),
-  `TryGetNearestOpenSlotIndex(worldPosition, maxDistance, out slotIndex)`
-  (nearest unoccupied slot on the horizontal X/Z plane within
-  `maxDistance`; used by HeroMergeInput for drag-to-open-slot
-  repositioning - see SYS_MergeSystem.md), `BuildGrid()` (rebuilds the
-  slot array; note this DISCARDS occupant state), `SetDimensions(int
-  rows, int columns)` (resizes and rebuilds; used by GeneratorSpawner),
-  plus `Rows` / `Columns` / `TotalSlots` / `CellSizeX` / `CellSizeZ`
-  accessors.
-- Caution: `BuildGrid()` is called from `Awake`, `SetDimensions`,
-  `OnValidate`, and (in edit mode) `OnDrawGizmos`. In play mode the gizmo
-  path only rebuilds when the slot count is out of date, so live occupant
-  state is not clobbered by gizmo redraws. `SetDimensions` on a grid that
-  already holds occupants will drop them from the data (the GameObjects
-  themselves are untouched).
-- Editor-only debug gizmo (`OnDrawGizmos`, toggle `drawDebugGizmo`): a
-  wire cube per slot (cyan = empty, orange = occupied), plus an optional
-  wireframe of the merge-area reference bounds (`drawMergeAreaBounds`;
-  yellow normally, red when the grid footprint overflows the bounds).
-  Purely a visualization aid.
+- Location: `Assets/Scripts/Merge/MergeSystem.cs`,
+  `Assets/Scripts/Merge/HeroMergeInput.cs` (namespace `MergeWars.Merge`).
+- `HeroMergeInput` requires `[RequireComponent(typeof(Collider))]`
+  (Physics.Raycast-based mouse dispatch, same input model as Generator)
+  and `[RequireComponent(typeof(HeroInstance))]`.
+- `MergeSystem.TryMerge(int slotIndexA, int slotIndexB)`: no-op (false)
+  if `gridManager`/`poolManager` unassigned, `slotIndexA == slotIndexB`,
+  either slot is empty, either occupant lacks a `HeroInstance`/
+  `definition`, or `CanMerge` fails. On success: `instanceB.starLevel +=
+  1`; if `laneBounds` assigned, re-queries `instanceB.laneIndex`; removes
+  occupantA from the grid and releases it to `PoolManager`.
+- `MergeSystem.CanMerge(HeroInstance, HeroInstance)`: exposed separately
+  so input systems (e.g. drag hover highlighting - not built) can preview
+  validity without executing a merge.
+- `HeroMergeInput.Initialize(GridManager, MergeSystem, LaneBounds =
+  null)`: wires dependencies at runtime - used by Generator when adding
+  this component to a freshly spawned hero. Prefab-authored instances can
+  instead assign fields directly in the Inspector.
+- `selectedForTap` is a `static` field - tap-select state is shared
+  across all heroes (only one hero can be "pending" at a time), not
+  per-instance.
+- `TryRaycastIgnoringSelf`: uses `Physics.RaycastAll` and filters out this
+  hero's own collider, finding the closest remaining hit - without this,
+  dragging a hero could hit its own collider first and snap it toward the
+  camera.
+- `OnDisable()` guards against a pooled/deactivated hero leaving stale
+  selection/press/drag state behind (clears `selectedForTap` if it was
+  this instance, restores collider trigger state, resets press/drag
+  flags).
+- Uses the legacy `Input` API and `Camera.main` for pointer position/
+  raycasting - the project's active input backend beyond this is
+  undocumented (see PROJECT_INDEX.md Open Unknowns).
 
-## Multiple grid instances
-- Confirmed pattern for separate grids (Merge grid, Generator grid): one
-  `GridManager` component per grid in the scene, each with independent
-  rows/columns/anchor/cell size. Wire each consumer to its specific
-  instance via serialized-reference fields - no registry/lookup-by-id
-  layer exists or is planned; add one only if a future system needs to
-  resolve "the X grid" without a direct scene reference.
-- A Building grid (for a future EnemyBaseManager) is not built and has no
-  SYS doc yet.
+## Assumed / Placeholder
+- ASSUMED PLACEHOLDER: `dragHeightOffset` (0.5) - no spec for how far
+  above ground a hero should visually lift while dragged/selected;
+  purely cosmetic, GridManager still controls the final settled position.
+- ASSUMED PLACEHOLDER: `dragSmoothTime` (0.06) - no spec for how "snappy"
+  vs. "floaty" the drag glide should feel.
+- ASSUMED PLACEHOLDER: `dragThresholdPixels` (10) - no spec for how far
+  the mouse must move before a press counts as a drag instead of a tap.
+- ASSUMED PLACEHOLDER: `MergeSystem.MaxStarLevel` (4, hardcoded const) -
+  CONFIRMED as the correct value, but not sourced from a shared
+  constant/config since none exists yet.
+
+## Not verified
+- Not run/tested in the Unity Editor as part of this doc regeneration
+  pass - this file was rewritten from source (MergeSystem.cs,
+  HeroMergeInput.cs) only, since the previous version was corrupted
+  (duplicated SYS_GridManager.md content).

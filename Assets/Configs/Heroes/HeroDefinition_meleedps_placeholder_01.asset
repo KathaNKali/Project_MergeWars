@@ -16,15 +16,23 @@ MonoBehaviour:
   displayName: meleedps_placeholder_01
   role: 1
   baseStats:
-    health: 0
-    attack: 0
-    attackSpeed: 0
+    hitPoints: 0
+    targets: 0
+    hitSpeed: 0
     range: 0
-    armor: 0
-    critChance: 0
-    critDamage: 0
+    damage: 0
+    damagePerSec: 0
+    count: 0
+    speed: 0
+    attackType: 0
+    projectileSpeed: 0
+    attackArea: 0
+    targetTeam: 0
+    targetType: 0
+    targetRestriction: 0
+    targetPreference: 0
   perStarMultiplier: 1.5
-  prefab: {fileID: 1167761570092420, guid: 8d0b44bafd16bc64f80600786cc2bf6b, type: 3}
+  prefab: {fileID: 2794571907202600602, guid: 18c59fb010f9296409427eb959d9a698, type: 3}
   spawnHeightOffset: 0.5
   subclass:
     id: 

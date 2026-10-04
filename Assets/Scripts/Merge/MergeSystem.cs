@@ -2,6 +2,7 @@ using UnityEngine;
 using MergeWars.Grid;
 using MergeWars.Pooling;
 using MergeWars.Heroes;
+using MergeWars.Lanes;
 
 namespace MergeWars.Merge
 {
@@ -28,6 +29,9 @@ namespace MergeWars.Merge
 
         [SerializeField] private GridManager gridManager;
         [SerializeField] private PoolManager poolManager;
+
+        [Tooltip("Optional. If assigned, a successful merge re-queries and updates the surviving hero's HeroInstance.laneIndex from its current position.")]
+        [SerializeField] private LaneBounds laneBounds;
 
         /// <summary>
         /// Attempts to merge the hero at slotIndexA into the hero at
@@ -61,6 +65,11 @@ namespace MergeWars.Merge
 
             // Destination is slotIndexB (the target of the drag/second tap).
             instanceB.starLevel += 1;
+
+            if (laneBounds != null)
+            {
+                instanceB.laneIndex = laneBounds.GetLaneIndex(instanceB.transform.position);
+            }
 
             gridManager.RemoveOccupant(slotIndexA);
             poolManager.Release(occupantA);

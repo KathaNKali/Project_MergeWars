@@ -3,6 +3,7 @@ using MergeWars.Grid;
 using MergeWars.Economy;
 using MergeWars.Pooling;
 using MergeWars.Merge;
+using MergeWars.Lanes;
 
 namespace MergeWars.Generators
 {
@@ -42,6 +43,8 @@ namespace MergeWars.Generators
         [SerializeField] private Transform championsContainer;
         [Tooltip("Optional. If assigned, spawned heroes get merge input wired up, same as Generator's own optional field.")]
         [SerializeField] private MergeSystem mergeSystem;
+        [Tooltip("Optional. If assigned, spawned heroes get their HeroInstance.laneIndex set at spawn, same as Generator's own optional field.")]
+        [SerializeField] private LaneBounds laneBounds;
 
         private void Start()
         {
@@ -85,7 +88,7 @@ namespace MergeWars.Generators
 
                 Generator instance = Instantiate(prefab, generatorsContainer, worldPositionStays: false);
                 instance.transform.position = generatorGridManager.GetWorldPosition(slotIndex);
-                instance.Initialize(mergeGridManager, manaEconomy, poolManager, championsContainer, mergeSystem);
+                instance.Initialize(mergeGridManager, manaEconomy, poolManager, championsContainer, mergeSystem, laneBounds);
 
                 generatorGridManager.PlaceOccupant(slotIndex, instance.gameObject);
             }

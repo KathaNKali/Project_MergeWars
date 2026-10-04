@@ -22,6 +22,9 @@ namespace MergeWars.Heroes
         [Tooltip("Current star level (1-4). Only mutated by MergeSystem on a successful merge.")]
         public int starLevel = 1;
 
+        [Tooltip("Current lane (0-based), set by whichever placement system placed this hero (Generator spawn, drag reposition, or merge resolution) via LaneBounds.GetLaneIndex. -1 = unassigned (no LaneBounds wired).")]
+        public int laneIndex = -1;
+
         /// <summary>
         /// Stats for this instance's current star level, computed on
         /// demand via HeroDefinition.GetStatsForStar — never cached, so

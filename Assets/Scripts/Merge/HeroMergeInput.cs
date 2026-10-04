@@ -1,6 +1,7 @@
 using UnityEngine;
 using MergeWars.Grid;
 using MergeWars.Heroes;
+using MergeWars.Lanes;
 
 namespace MergeWars.Merge
 {
@@ -30,17 +31,22 @@ namespace MergeWars.Merge
         [SerializeField] private GridManager gridManager;
         [SerializeField] private MergeSystem mergeSystem;
 
+        [Tooltip("Optional. If assigned, a successful drag-to-open-slot reposition re-queries and updates HeroInstance.laneIndex from the hero's new position.")]
+        [SerializeField] private LaneBounds laneBounds;
+
         /// <summary>
         /// Wires this component's dependencies at runtime — used by
         /// Generator when adding this component to a freshly spawned hero
         /// (placeholder prefabs won't have it pre-authored with Inspector
         /// references). Prefab-authored instances can instead assign
-        /// gridManager/mergeSystem directly in the Inspector and skip this.
+        /// gridManager/mergeSystem/laneBounds directly in the Inspector and
+        /// skip this.
         /// </summary>
-        public void Initialize(GridManager gridManager, MergeSystem mergeSystem)
+        public void Initialize(GridManager gridManager, MergeSystem mergeSystem, LaneBounds laneBounds = null)
         {
             this.gridManager = gridManager;
             this.mergeSystem = mergeSystem;
+            this.laneBounds = laneBounds;
         }
 
         [Tooltip("Layer mask used when raycasting for a hero drop target at release/tap time. Should include only the layer heroes are on (e.g. 'Heroes'), not the ground.")]
@@ -83,10 +89,12 @@ namespace MergeWars.Merge
         private Vector3 dragTargetPosition;
         private Vector3 dragVelocity;
         private bool ownColliderWasTrigger;
+        private HeroInstance heroInstance;
 
         private void Awake()
         {
             ownCollider = GetComponent<Collider>();
+            heroInstance = GetComponent<HeroInstance>();
         }
 
         private void OnMouseDown()
@@ -264,6 +272,12 @@ namespace MergeWars.Merge
             gridManager.RemoveOccupant(oldSlotIndex);
             gridManager.PlaceOccupant(newSlotIndex, gameObject);
             transform.position = gridManager.GetWorldPosition(newSlotIndex);
+
+            if (laneBounds != null && heroInstance != null)
+            {
+                heroInstance.laneIndex = laneBounds.GetLaneIndex(transform.position);
+            }
+
             return true;
         }
 

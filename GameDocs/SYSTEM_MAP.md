@@ -72,10 +72,19 @@ codebase — see PROJECT_INDEX.md for build status.
   - GridManager (TryGetSlotIndexForOccupant, TryGetNearestOpenSlotIndex,
     RemoveOccupant, PlaceOccupant, GetWorldPosition, CellSizeX/CellSizeZ)
   - MergeSystem (TryMerge)
-  - HeroInstance (GetComponent on the drop target)
+  - HeroInstance (GetComponent on the drop target; also caches its own
+    HeroInstance to write laneIndex)
+  - LaneBounds (optional — re-queries and updates HeroInstance.laneIndex
+    after a drag-to-open-slot reposition)
   Also uses Camera.main and the legacy Input API for pointer position.
   Implements both confirmed merge triggers (tap-tap-select and
   drag-and-drop) in a single component. See SYS_MergeSystem.md.
+
+- **LaneBounds** (`Assets/Scripts/Lanes/LaneBounds.cs`) — foundational,
+  standalone. No dependencies on other gameplay systems (including
+  GridManager/GridData — deliberately decoupled). Answers a world-position
+  -to-lane-index query on demand; stores no per-hero state itself. See
+  SYS_LaneSystem.md.
 
 - **GeneratorSpawner / GeneratorLoadout** (`Assets/Scripts/Generator/`) —
   `GeneratorSpawner` depends on:
@@ -105,9 +114,12 @@ HeroInstance → HeroDefinition (definition reference)
 MergeSystem → GridManager (GetOccupant, RemoveOccupant)
 MergeSystem → PoolManager (Release)
 MergeSystem → HeroInstance (reads/mutates)
+MergeSystem → LaneBounds (optional, re-queries surviving hero's laneIndex)
 HeroMergeInput → GridManager (TryGetSlotIndexForOccupant, TryGetNearestOpenSlotIndex, RemoveOccupant, PlaceOccupant, GetWorldPosition, CellSizeX/Z)
-HeroMergeInput → HeroInstance (drop-target lookup)
+HeroMergeInput → HeroInstance (drop-target lookup; caches own HeroInstance for laneIndex)
 HeroMergeInput → MergeSystem (TryMerge)
+HeroMergeInput → LaneBounds (optional, re-queries laneIndex after reposition)
+Generator → LaneBounds (optional, sets laneIndex at spawn)
 GeneratorSpawner → GridManager (Generator grid — SetDimensions, TryGetOpenSlot, GetWorldPosition, PlaceOccupant)
 GeneratorSpawner → GeneratorLoadout (data)
 GeneratorSpawner → Generator (Instantiate, Initialize)
@@ -121,6 +133,9 @@ PoolManager, ManaEconomy, or CoinEconomy — they are foundational/
 leaf-consumed only.
 CoinEconomy currently has no consumer at all (no spender/shop system
 exists yet) — expected, not a gap.
+LaneBounds is foundational like PoolManager/CurrencyEconomy — Generator,
+HeroMergeInput, and MergeSystem each hold an optional reference to it
+(null-safe, same pattern as Generator's optional MergeSystem field).
 
 ## Retired
 `HeroClassConfig` and `HeroClassId` (Ground/Air/Vehicles) have been

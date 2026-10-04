@@ -79,14 +79,19 @@ _Synced with code: Generator.cs, GeneratorConfig.cs, GeneratorSpawner.cs, Genera
 
 ## Wiring scene-object dependencies when Generator is spawned from a prefab
 - CONFIRMED: `gridManager`, `manaEconomy`, `poolManager`,
-  `championsContainer`, and `mergeSystem` are scene objects. A prefab
-  asset cannot hold a reference to a scene object, so a Generator
+  `championsContainer`, `mergeSystem`, and `laneBounds` are scene objects.
+  A prefab asset cannot hold a reference to a scene object, so a Generator
   instantiated from a prefab always starts with these fields empty.
 - `Generator.Initialize(GridManager gridManager, ManaEconomy manaEconomy,
   PoolManager poolManager, Transform championsContainer, MergeSystem
-  mergeSystem = null)` wires them at runtime - same pattern as
-  `HeroMergeInput.Initialize(...)`. Whoever instantiates a Generator
-  prefab must call it immediately after `Instantiate()`.
+  mergeSystem = null, LaneBounds laneBounds = null)` wires them at
+  runtime - same pattern as `HeroMergeInput.Initialize(...)`. Whoever
+  instantiates a Generator prefab must call it immediately after
+  `Instantiate()`. Dragging a scene LaneBounds instance directly into the
+  Generator prefab's Inspector field does NOT work for prefab-instantiated
+  Generators - it must be assigned to GeneratorSpawner's own `laneBounds`
+  field instead, which passes it through on each spawned instance's
+  `Initialize()` call.
 - Hand-placed scene Generators can instead assign these in the Inspector
   and skip `Initialize`.
 
@@ -104,7 +109,7 @@ _Synced with code: Generator.cs, GeneratorConfig.cs, GeneratorSpawner.cs, Genera
   grid's `GridManager` (`generatorGridManager`), a `GeneratorLoadout`,
   `generatorsContainer`, and the Merge-side scene objects each spawned
   Generator needs (`mergeGridManager`, `manaEconomy`, `poolManager`,
-  `championsContainer`, optional `mergeSystem`).
+  `championsContainer`, optional `mergeSystem`, optional `laneBounds`).
   - `Start()` calls public `SpawnLoadout()`. Logs a warning and no-ops if
     the grid manager, loadout, or prefab list is missing/empty.
   - Resizes the Generator grid via `GridManager.SetDimensions(1, count)`
@@ -113,7 +118,7 @@ _Synced with code: Generator.cs, GeneratorConfig.cs, GeneratorSpawner.cs, Genera
     `Instantiate()`s directly (no PoolManager - one-time spawn), sets
     position from `GetWorldPosition(slot)`, calls `Generator.Initialize(
     mergeGridManager, manaEconomy, poolManager, championsContainer,
-    mergeSystem)`, and `PlaceOccupant(slot, instance.gameObject)`.
+    mergeSystem, laneBounds)`, and `PlaceOccupant(slot, instance.gameObject)`.
   - Note: `SpawnLoadout()` is public and can be called twice; it does not
     clear previously spawned generators or reset the Generator grid's
     occupants. Not guarded - flagged.

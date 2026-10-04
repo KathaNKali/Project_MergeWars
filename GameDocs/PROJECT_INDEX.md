@@ -28,6 +28,7 @@ flagged for human follow-up, not fabricated here.
 | Generator | Built (real) | `Assets/Scripts/Generator/Generator.cs` | SYS_Generator.md |
 | MergeSystem | Built (real) | `Assets/Scripts/Merge/MergeSystem.cs` | SYS_MergeSystem.md |
 | HeroMergeInput | Built (real, tap-tap-select + drag-and-drop) | `Assets/Scripts/Merge/HeroMergeInput.cs` | SYS_MergeSystem.md |
+| LaneBounds | Built (real, standalone, decoupled from GridManager - world-position lane query) | `Assets/Scripts/Lanes/LaneBounds.cs` | SYS_LaneSystem.md |
 | EnemyBaseManager | Not built | — | — |
 | Unlock system | Not built (intentionally deferred) | — | — |
 | Discard mechanic | Not built | — | — |
@@ -107,6 +108,17 @@ flagged for human follow-up, not fabricated here.
   current `HeroStats`/`GeneratorConfig` fields.
 - `GameDocs/IMPLEMENTATION_PLAN.md` is referenced by workflow instructions
   but was not provided.
+- `GameDocs/Systems/SYS_MergeSystem.md` currently contains duplicated
+  `SYS_GridManager.md` content (appears to be an accidental overwrite) -
+  it does not describe MergeSystem/HeroMergeInput at all. Needs to be
+  regenerated/fixed by a human; not fixed here as it was outside this
+  pass's scope.
+- `LaneBounds.laneWidth` (default 2) and the even-split-only lane
+  authoring (no manual per-lane uneven widths) are ASSUMED PLACEHOLDERS -
+  no balance/layout doc specifies real values yet. See SYS_LaneSystem.md.
+- The movement/march system that would actually walk a hero down its
+  lane toward the enemy base is UNBUILT - LaneBounds only exposes the
+  `GetLaneIndex` query; nothing consumes it for movement yet.
 
 ## Logical next step
 GridManager, PoolManager, ManaEconomy, CoinEconomy, the Hero Character

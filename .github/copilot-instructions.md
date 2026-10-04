@@ -48,6 +48,9 @@ this sequence, no exceptions:
    "go ahead", "implement this", "do it", or "proceed" — counts.
 4. **Only after `Ayyappa`**, implement the discussed and agreed-upon plan.
 5. This applies to every request going forward, by default.
+6. **Keep responses concise.** Explain minimally — prefer bulleted/
+   numbered points over prose paragraphs in every response, not just
+   during the discussion phase above.
 
 Read-only investigation (searching/reading files, dependency analysis,
 asking questions) is always allowed before `Ayyappa`. Only actual code

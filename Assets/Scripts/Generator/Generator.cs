@@ -4,6 +4,7 @@ using MergeWars.Pooling;
 using MergeWars.Economy;
 using MergeWars.Heroes;
 using MergeWars.Merge;
+using MergeWars.Lanes;
 
 namespace MergeWars.Generators
 {
@@ -31,6 +32,9 @@ namespace MergeWars.Generators
         [Tooltip("Optional. If assigned, spawned heroes get a HeroMergeInput component wired to this MergeSystem/GridManager, enabling tap-tap and drag-to-merge input.")]
         [SerializeField] private MergeSystem mergeSystem;
 
+        [Tooltip("Optional. If assigned, spawned heroes get their HeroInstance.laneIndex set from this hero's spawn position.")]
+        [SerializeField] private LaneBounds laneBounds;
+
         /// <summary>
         /// Wires this Generator's scene-object dependencies (the Merge
         /// grid's GridManager, ManaEconomy, PoolManager, the champions
@@ -43,13 +47,14 @@ namespace MergeWars.Generators
         /// assign these directly in the Inspector (as a per-instance
         /// prefab override) and skip calling this.
         /// </summary>
-        public void Initialize(GridManager gridManager, ManaEconomy manaEconomy, PoolManager poolManager, Transform championsContainer, MergeSystem mergeSystem = null)
+        public void Initialize(GridManager gridManager, ManaEconomy manaEconomy, PoolManager poolManager, Transform championsContainer, MergeSystem mergeSystem = null, LaneBounds laneBounds = null)
         {
             this.gridManager = gridManager;
             this.manaEconomy = manaEconomy;
             this.poolManager = poolManager;
             this.championsContainer = championsContainer;
             this.mergeSystem = mergeSystem;
+            this.laneBounds = laneBounds;
         }
 
         /// <summary>
@@ -107,10 +112,15 @@ namespace MergeWars.Generators
                 {
                     mergeInput = hero.AddComponent<HeroMergeInput>();
                 }
-                mergeInput.Initialize(gridManager, mergeSystem);
+                mergeInput.Initialize(gridManager, mergeSystem, laneBounds);
             }
 
             gridManager.PlaceOccupant(slotIndex, hero);
+
+            if (laneBounds != null)
+            {
+                heroInstance.laneIndex = laneBounds.GetLaneIndex(hero.transform.position);
+            }
 
             return true;
         }
