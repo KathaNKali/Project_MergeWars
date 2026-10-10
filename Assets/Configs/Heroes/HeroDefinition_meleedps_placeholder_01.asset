@@ -32,7 +32,7 @@ MonoBehaviour:
     targetRestriction: 0
     targetPreference: 0
   perStarMultiplier: 1.5
-  prefab: {fileID: 2794571907202600602, guid: 18c59fb010f9296409427eb959d9a698, type: 3}
+  prefab: {fileID: 1210366466818188, guid: ba956f03a6c694a44876acb8bdbcfd90, type: 3}
   spawnHeightOffset: 0.5
   subclass:
     id: 
