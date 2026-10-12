@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using MergeWars.Grid;
 using MergeWars.Pooling;
 using MergeWars.Economy;
@@ -9,16 +10,16 @@ using MergeWars.Lanes;
 namespace MergeWars.Generators
 {
     /// <summary>
-    /// 3D world object on the battlefield, tapped via Physics.Raycast
-    /// (requires a Collider). Requests a pooled hero from PoolManager,
-    /// spends mana via ManaEconomy, and places the hero into
-    /// GridManager's next open slot. Generator's involvement ends at
-    /// spawn — it does not own or track the hero afterward, and has no
-    /// unlock check (every generator is tappable from the start; that is
-    /// intentionally deferred, not stubbed).
+    /// UI Button-tapped generator (not a 3D raycast-tapped world object).
+    /// Requests a pooled hero from PoolManager, spends mana via
+    /// ManaEconomy, and places the hero into GridManager's next open
+    /// slot. Generator's involvement ends at spawn — it does not own or
+    /// track the hero afterward, and has no unlock check (every generator
+    /// is tappable from the start; that is intentionally deferred, not
+    /// stubbed).
     /// See /GameDocs/Systems/SYS_Generator.md.
     /// </summary>
-    [RequireComponent(typeof(Collider))]
+    [RequireComponent(typeof(Button))]
     public class Generator : MonoBehaviour
     {
         [SerializeField] private GeneratorConfig config;
@@ -112,7 +113,7 @@ namespace MergeWars.Generators
                 {
                     mergeInput = hero.AddComponent<HeroMergeInput>();
                 }
-                mergeInput.Initialize(gridManager, mergeSystem, laneBounds);
+                mergeInput.Initialize(gridManager, mergeSystem, laneBounds) ;
             }
 
             gridManager.PlaceOccupant(slotIndex, hero);
@@ -125,14 +126,22 @@ namespace MergeWars.Generators
             return true;
         }
 
-        // Simple direct entry point for raycast-based tapping (relies on
-        // Physics.Raycast against this object's Collider via Unity's
-        // built-in mouse-event dispatch). A dedicated input dispatcher
-        // system may replace this later; not built here since none was
-        // requested.
-        private void OnMouseDown()
+        private Button button;
+        private UnityEngine.Events.UnityAction tapListener;
+
+        private void Awake()
         {
-            TryTap();
+            button = GetComponent<Button>();
+            tapListener = () => TryTap();
+            button.onClick.AddListener(tapListener);
+        }
+
+        private void OnDestroy()
+        {
+            if (button != null)
+            {
+                button.onClick.RemoveListener(tapListener);
+            }
         }
     }
 }

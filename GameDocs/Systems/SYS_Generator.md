@@ -3,10 +3,14 @@
 _Synced with code: Generator.cs, GeneratorConfig.cs, GeneratorSpawner.cs, GeneratorLoadout.cs. `GeneratorSetupTool.cs` was not re-read this pass._
 
 ## Confirmed
-- CONFIRMED: Generator is a 3D world object on the battlefield (not UI),
-  positioned outside/below the grid, tapped via Physics.Raycast -
-  consistent with MergeSystem's drag/drop input model and Touchdown-style
-  camera framing.
+- CONFIRMED (updated): Generator is tapped via a UI Button (`UnityEngine.UI.Button.onClick`,
+  wired in code in `Awake()`), NOT a 3D raycast/Collider-based world
+  object anymore - reverses the earlier "3D world object (not UI)"
+  decision. `TryTap()` itself is unchanged; only the input entry point
+  moved from `OnMouseDown()`/Physics.Raycast to the Button click event.
+  Positioning/placement into the Generator grid (via GeneratorSpawner and
+  GridManager) is unchanged and still drives `transform.position` - the
+  UI Canvas is expected to be World Space mode for this to keep working.
 - CONFIRMED: spawned hero is instantiated via PoolManager (see
   SYS_PoolManager.md), not raw Instantiate(). Generator requests an object
   from the pool, does not own or track it after handing it to GridManager.
@@ -31,7 +35,13 @@ _Synced with code: Generator.cs, GeneratorConfig.cs, GeneratorSpawner.cs, Genera
 ## Implementation notes
 - Location: `Assets/Scripts/Generator/Generator.cs` (namespace
   `MergeWars.Generators`), MonoBehaviour,
-  `[RequireComponent(typeof(Collider))]` so it is raycast-hittable.
+  `[RequireComponent(typeof(Button))]` (UnityEngine.UI) - tap input is a
+  UI Button click, not a 3D Collider/raycast.
+- Tap entry point: `Awake()` caches the `Button` and wires
+  `button.onClick.AddListener(() => TryTap())` in code (not per-prefab
+  Inspector wiring), removed in `OnDestroy()` for subscribe/unsubscribe
+  symmetry. `TryTap()` remains public so it can still be called directly
+  if needed.
 - `TryTap()` order: (0) `config`, `gridManager`, `manaEconomy`,
   `poolManager` must all be assigned, else no-op; (1)
   `ManaEconomy.CanAfford(config.manaCost)` - false is a no-op, no mana
