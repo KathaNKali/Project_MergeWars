@@ -1086,7 +1086,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MergeWars.Grid.GridManager
   rows: 5
-  columns: 5
+  columns: 4
   anchor: {fileID: 1118980007}
   cellSizeX: 2
   cellSizeZ: 2.3
@@ -1155,10 +1155,45 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 752100258546972101, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.62
+      objectReference: {fileID: 0}
+    - target: {fileID: 752100258546972101, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 5.45
+      objectReference: {fileID: 0}
     - target: {fileID: 1257610511221330403, guid: a1892b5dc8a964c0ca1e042732bd0d80,
         type: 3}
       propertyPath: m_Name
       value: Level_00_Basic
+      objectReference: {fileID: 0}
+    - target: {fileID: 1959807115147278670, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2018267602568272416, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3806951171667216943, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3852407042444609589, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4320380794016951332, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7003417685974946298, guid: a1892b5dc8a964c0ca1e042732bd0d80,
         type: 3}
@@ -1210,11 +1245,109 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7948484161542514609, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 5.43
+      objectReference: {fileID: 0}
+    - target: {fileID: 7948484161542514609, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 5.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8223496732689052402, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 5.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 8831514660589705809, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5898231011793747030, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 816344868079926746}
+    - targetCorrespondingSourceObject: {fileID: 6562921267311876905, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 816344868079926745}
   m_SourcePrefab: {fileID: 100100000, guid: a1892b5dc8a964c0ca1e042732bd0d80, type: 3}
+--- !u!1 &816344868079926743 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6562921267311876905, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+    type: 3}
+  m_PrefabInstance: {fileID: 816344868079926742}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &816344868079926744 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5898231011793747030, guid: a1892b5dc8a964c0ca1e042732bd0d80,
+    type: 3}
+  m_PrefabInstance: {fileID: 816344868079926742}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &816344868079926745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 816344868079926743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b81dc1a6e4b189d4bae2faab8a2a1a25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoreMountains.Tools::MoreMountains.Tools.MMPath
+  CycleOption: 0
+  LoopInitialMovementDirection: 0
+  PathElements:
+  - PathElementPosition: {x: 0, y: 0, z: 0}
+    Delay: 0
+  - PathElementPosition: {x: 1.15, y: 0, z: 5}
+    Delay: 0
+  - PathElementPosition: {x: 1.15, y: 0, z: 10}
+    Delay: 0
+  - PathElementPosition: {x: 1.15, y: 0, z: 15}
+    Delay: 0
+  ReferenceMMPath: {fileID: 0}
+  AbsoluteReferencePath: 0
+  MinDistanceToGoal: 0.1
+  LockHandlesOnXAxis: 0
+  LockHandlesOnYAxis: 0
+  LockHandlesOnZAxis: 0
+--- !u!114 &816344868079926746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 816344868079926744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b81dc1a6e4b189d4bae2faab8a2a1a25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoreMountains.Tools::MoreMountains.Tools.MMPath
+  CycleOption: 0
+  LoopInitialMovementDirection: 0
+  PathElements:
+  - PathElementPosition: {x: 0, y: 0, z: 0}
+    Delay: 0
+  - PathElementPosition: {x: -1.15, y: 0, z: 5}
+    Delay: 0
+  - PathElementPosition: {x: -1.15, y: 0, z: 10}
+    Delay: 0
+  - PathElementPosition: {x: -1.15, y: 0, z: 15}
+    Delay: 0
+  ReferenceMMPath: {fileID: 0}
+  AbsoluteReferencePath: 0
+  MinDistanceToGoal: 0.1
+  LockHandlesOnXAxis: 0
+  LockHandlesOnYAxis: 0
+  LockHandlesOnZAxis: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
