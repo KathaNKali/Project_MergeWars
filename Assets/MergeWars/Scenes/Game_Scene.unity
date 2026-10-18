@@ -337,7 +337,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4641358202997358, guid: 98433acbb7f124e21b9b5cb4521b80cc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -16.83325
+      value: -22.29
       objectReference: {fileID: 0}
     - target: {fileID: 4641358202997358, guid: 98433acbb7f124e21b9b5cb4521b80cc, type: 3}
       propertyPath: m_LocalRotation.w
@@ -367,6 +367,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114521150146711736, guid: 98433acbb7f124e21b9b5cb4521b80cc,
+        type: 3}
+      propertyPath: Cam
+      value: 
+      objectReference: {fileID: 1444627289}
+    - target: {fileID: 114521150146711736, guid: 98433acbb7f124e21b9b5cb4521b80cc,
+        type: 3}
+      propertyPath: Destination
+      value: 
+      objectReference: {fileID: 816344868079926743}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -797,6 +807,12 @@ MonoBehaviour:
   championsContainer: {fileID: 0}
   mergeSystem: {fileID: 0}
   laneBounds: {fileID: 0}
+--- !u!20 &1444627289 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 1117384771960154654, guid: cb2be75ff9838bd4d874077280b5c07c,
+    type: 3}
+  m_PrefabInstance: {fileID: 1475783358}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1475783358
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -900,7 +916,7 @@ PrefabInstance:
     - target: {fileID: 4266446789798152108, guid: cb2be75ff9838bd4d874077280b5c07c,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 347.18698
+      value: 347.18695
       objectReference: {fileID: 0}
     - target: {fileID: 4886732079393109087, guid: cb2be75ff9838bd4d874077280b5c07c,
         type: 3}
@@ -920,7 +936,7 @@ PrefabInstance:
     - target: {fileID: 4886732079393109087, guid: cb2be75ff9838bd4d874077280b5c07c,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 734
+      value: 733.99994
       objectReference: {fileID: 0}
     - target: {fileID: 4886732079393109087, guid: cb2be75ff9838bd4d874077280b5c07c,
         type: 3}

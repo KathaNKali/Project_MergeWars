@@ -6,6 +6,7 @@ using MergeWars.Economy;
 using MergeWars.Heroes;
 using MergeWars.Merge;
 using MergeWars.Lanes;
+using System.Data;
 
 namespace MergeWars.Generators
 {
@@ -57,6 +58,10 @@ namespace MergeWars.Generators
             this.mergeSystem = mergeSystem;
             this.laneBounds = laneBounds;
         }
+        public void Update()
+        {
+            //if (Input.GetMouseButtonDown(0) && Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit)) Debug.Log("Hit: " + hit.collider.name, hit.collider);
+        }
 
         /// <summary>
         /// Attempts to spend mana and spawn this generator's hero into the
@@ -65,6 +70,10 @@ namespace MergeWars.Generators
         /// </summary>
         public bool TryTap()
         {
+            Debug.DrawRay(Camera.main.ScreenPointToRay(Input.mousePosition).origin,
+              Camera.main.ScreenPointToRay(Input.mousePosition).direction * 100f,
+              Color.red);
+
             if (config == null || gridManager == null || manaEconomy == null || poolManager == null)
             {
                 return false;
